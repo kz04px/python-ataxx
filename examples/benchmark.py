@@ -1,4 +1,5 @@
 import ataxx
+import ataxx.players
 import time
 
 def main():
@@ -42,6 +43,15 @@ def main():
     t2 = time.time()
     total += t2-t1
     print(F"Parsing: {t2-t1:.4f} seconds")
+
+    # Negamax
+    t1 = time.time()
+    for fen in fens:
+        board = ataxx.Board(fen)
+        move = ataxx.players.negamax(board, 3)
+    t2 = time.time()
+    total += t2-t1
+    print(F"Negamax: {t2-t1:.4f} seconds")
 
     print(F"Total:   {total:.4f} seconds")
 
