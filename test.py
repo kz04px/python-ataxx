@@ -142,10 +142,26 @@ class TestStringMethods(unittest.TestCase):
 
         for fen in fens:
             board = ataxx.Board(fen)
-            for move in board.legal_moves():
+
+            while not board.gameover() and board.halfmove_clock < 500:
+                current_fen = board.get_fen()
+
+                # Test all legal moves
+                for move in board.legal_moves():
+                    board.makemove(move)
+                    board.undo()
+                    self.assertTrue(board.get_fen() == current_fen)
+
+                # Pick a random move and keep going
+                move = random.choice(board.legal_moves())
                 board.makemove(move)
+
+            # Undo every move in the game
+            while board.main_line():
                 board.undo()
-                self.assertTrue(board.get_fen() == fen)
+
+            # Make sure we're back where we started
+            self.assertTrue(board.get_fen() == fen)
 
 if __name__ == '__main__':
     unittest.main()
