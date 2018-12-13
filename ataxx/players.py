@@ -9,7 +9,7 @@ def random_move(board):
     return random.choice(moves)
 
 def greedy(board):
-    most = -1
+    most = -99999
     moves = []
 
     for move in board.legal_moves():
@@ -32,7 +32,7 @@ def greedy(board):
             moves.append(move)
 
     # No legal moves
-    if most < 0:
+    if moves == []:
         return None
 
     return random.choice(moves)
