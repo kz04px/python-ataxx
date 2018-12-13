@@ -1,4 +1,5 @@
 import ataxx
+import random
 import unittest
 
 class TestStringMethods(unittest.TestCase):
@@ -80,6 +81,26 @@ class TestStringMethods(unittest.TestCase):
             for piece in [ataxx.BLACK, ataxx.WHITE, ataxx.GAP, ataxx.EMPTY]:
                 board.set(x, y, piece)
                 self.assertTrue(piece == board.get(x, y))
+
+    def test_main_line(self):
+        for _ in range(10):
+            history = []
+
+            # Play random moves on the board
+            board1 = ataxx.Board("startpos")
+            while not board1.gameover() and len(history) < 50:
+                moves = board1.legal_moves()
+                move = random.choice(moves)
+                board1.makemove(move)
+                history.append(move)
+
+            # Replay the moves on a new board
+            board2 = ataxx.Board("startpos")
+            for move in board1.main_line():
+                board2.makemove(move)
+
+            self.assertTrue(board1.main_line() == history)
+            self.assertTrue(board1.get_fen() == board2.get_fen())
 
 if __name__ == '__main__':
     unittest.main()
