@@ -25,10 +25,13 @@ class TestStringMethods(unittest.TestCase):
             {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "nodes": [1, 16, 256, 5948, 133264]},
         ]
 
+        depth = 4
         for position in positions:
             fen = position["fen"]
             board = ataxx.Board(fen)
             for idx, nodes in enumerate(position["nodes"]):
+                if idx > depth:
+                    break
                 self.assertTrue(board.perft(idx) == nodes)
 
     def test_single_double(self):
