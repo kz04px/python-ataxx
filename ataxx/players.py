@@ -1,6 +1,5 @@
 import ataxx
 import random
-import copy
 
 def random_move(board):
     moves = board.legal_moves()
@@ -13,9 +12,9 @@ def greedy(board):
     moves = []
 
     for move in board.legal_moves():
-        nboard = copy.deepcopy(board)
-        nboard.makemove(move)
-        num_black, num_white, num_gaps, num_empty = nboard.count()
+        board.makemove(move)
+        num_black, num_white, num_gaps, num_empty = board.count()
+        board.undo()
 
         # Maximise our advantage
         if board.turn == ataxx.BLACK:
@@ -49,13 +48,14 @@ def negamax(board, depth, root=True):
     best_move = None
 
     for move in board.legal_moves():
-        nboard = copy.deepcopy(board)
-        nboard.makemove(move)
-        score = -negamax(nboard, depth-1, root=False)
+        board.makemove(move)
+        score = -negamax(board, depth-1, root=False)
 
         if score > best_score:
             best_score = score
             best_move = move
+
+        board.undo()
 
     if root:
         return best_move
@@ -73,16 +73,18 @@ def alphabeta(board, alpha, beta, depth, root=True):
     best_move = None
 
     for move in board.legal_moves():
-        nboard = copy.deepcopy(board)
-        nboard.makemove(move)
-        score = -alphabeta(nboard, -beta, -alpha, depth-1, root=False)
+        board.makemove(move)
+        score = -alphabeta(board, -beta, -alpha, depth-1, root=False)
 
         if score > alpha:
             alpha = score
             best_move = move
         if score >= beta:
             score = beta
+            board.undo()
             break
+
+        board.undo()
 
     if root:
         return best_move
