@@ -36,3 +36,28 @@ def greedy(board):
         return None
 
     return random.choice(moves)
+
+def negamax(board, depth, root=True):
+    if depth == 0:
+        black, white, _, _ = board.count()
+        if board.turn == ataxx.BLACK:
+            return black - white
+        else:
+            return white - black
+
+    best_score = -99999
+    best_move = None
+
+    for move in board.legal_moves():
+        nboard = copy.deepcopy(board)
+        nboard.makemove(move)
+        score = -negamax(nboard, depth-1, root=False)
+
+        if score > best_score:
+            best_score = score
+            best_move = move
+
+    if root:
+        return best_move
+    else:
+        return best_score
