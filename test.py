@@ -17,17 +17,18 @@ class TestStringMethods(unittest.TestCase):
 
     def test_perft(self):
         positions = [
-            {"fen": "x5o/7/7/7/7/7/o5x x",           "nodes": 256},
-            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",   "nodes": 196},
-            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x", "nodes": 196},
-            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "nodes": 256},
+            {"fen": ataxx.FEN_EMPTY,                 "nodes": [1, 0, 0, 0, 0]},
+            {"fen": "x5o/7/7/7/7/7/o5x x",           "nodes": [1, 16, 256, 6460, 155888]},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",   "nodes": [1, 14, 196, 4184, 86528]},
+            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x", "nodes": [1, 14, 196, 4100, 83104]},
+            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "nodes": [1, 16, 256, 5948, 133264]},
         ]
 
         for position in positions:
             fen = position["fen"]
-            nodes = position["nodes"]
             board = ataxx.Board(fen)
-            self.assertTrue(board.perft(2) == nodes)
+            for idx, nodes in enumerate(position["nodes"]):
+                self.assertTrue(board.perft(idx) == nodes)
 
     def test_single_double(self):
         fens = [
