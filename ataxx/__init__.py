@@ -15,6 +15,7 @@ class Move:
         self.fr_y = fr_y
         self.to_x = to_x
         self.to_y = to_y
+        self.flipped = [False]*8
 
     def is_single(self):
         dX = abs(self.fr_x - self.to_x)
@@ -227,15 +228,42 @@ class Board:
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
-        for n in SINGLES:
-            x, y = move.to_x + n[0], move.to_y + n[1]
+        for idx, val in enumerate(SINGLES):
+            x, y = move.to_x + val[0], move.to_y + val[1]
             if self.get(x, y) == opponent:
+                move.flipped[idx] = True
                 self.set(x, y, self.turn)
+            else:
+                move.flipped[idx] = False
 
         self.history.append(move)
         self.halfmove_clock += 1
-
         self.turn = opponent
+
+    def undo(self):
+        if self.turn == BLACK:
+            us = WHITE
+        else:
+            us = BLACK
+        them = self.turn
+
+        move = self.history.pop()
+
+        # Remove the piece we placed
+        self.set(move.to_x, move.to_y, EMPTY)
+
+        # Restore the piece we removed
+        if move.is_double():
+            self.set(move.fr_x, move.fr_y, us)
+
+        # Restore the pieces we captured
+        for idx, val in enumerate(move.flipped):
+            if val:
+                square = SINGLES[idx]
+                self.set(move.to_x + square[0], move.to_y + square[1], them)
+
+        self.halfmove_clock -= 1
+        self.turn = us
 
     def main_line(self):
         return self.history
@@ -279,9 +307,9 @@ class Board:
         nodes = 0
 
         for move in movelist:
-            nboard = copy.deepcopy(self)
-            nboard.makemove(move)
-            nodes += nboard.perft(depth-1)
+            self.makemove(move)
+            nodes += self.perft(depth-1)
+            self.undo()
 
         return nodes
 
