@@ -279,9 +279,9 @@ class Board:
         nodes = 0
 
         for move in movelist:
-            nPos = copy.deepcopy(self)
-            nPos.makemove(move)
-            nodes += nPos.perft(depth-1)
+            nboard = copy.deepcopy(self)
+            nboard.makemove(move)
+            nodes += nboard.perft(depth-1)
 
         return nodes
 
