@@ -22,7 +22,7 @@ def main():
             board.perft(i)
         t2 = time.time()
     total += t2-t1
-    print(F"Perft:   {t2-t1:.4f} seconds")
+    print(F"Perft:     {t2-t1:.4f} seconds")
 
     # Movegen
     t1 = time.time()
@@ -33,7 +33,7 @@ def main():
                 assert move
     t2 = time.time()
     total += t2-t1
-    print(F"Movegen: {t2-t1:.4f} seconds")
+    print(F"Movegen:   {t2-t1:.4f} seconds")
 
     # FEN parsing
     t1 = time.time()
@@ -42,18 +42,27 @@ def main():
             board = ataxx.Board(fen)
     t2 = time.time()
     total += t2-t1
-    print(F"Parsing: {t2-t1:.4f} seconds")
+    print(F"Parsing:   {t2-t1:.4f} seconds")
 
     # Negamax
     t1 = time.time()
     for fen in fens:
         board = ataxx.Board(fen)
-        move = ataxx.players.negamax(board, 3)
+        move = ataxx.players.negamax(board, 2)
     t2 = time.time()
     total += t2-t1
-    print(F"Negamax: {t2-t1:.4f} seconds")
+    print(F"Negamax:   {t2-t1:.4f} seconds")
 
-    print(F"Total:   {total:.4f} seconds")
+    # Alphabeta
+    t1 = time.time()
+    for fen in fens:
+        board = ataxx.Board(fen)
+        move = ataxx.players.alphabeta(board, -999999, 999999, 3)
+    t2 = time.time()
+    total += t2-t1
+    print(F"Alphabeta: {t2-t1:.4f} seconds")
+
+    print(F"Total:     {total:.4f} seconds")
 
 if __name__ == "__main__":
     main()
