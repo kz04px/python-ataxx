@@ -1,4 +1,5 @@
 import ataxx
+import ataxx.players
 import random
 import unittest
 
@@ -102,6 +103,30 @@ class TestStringMethods(unittest.TestCase):
 
             self.assertTrue(board1.main_line() == history)
             self.assertTrue(board1.get_fen() == board2.get_fen())
+
+    def test_players(self):
+        positions = [
+            {"fen": "x5o/7/7/7/7/7/o5x x",           "moves": ["f1", "f2", "g2", "a6", "b6", "b7"]},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",   "moves": ["a2", "b1", "b2", "g6", "f6", "f7"]},
+            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x", "moves": ["f1", "f2", "g2", "a6", "b6", "b7"]},
+            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "moves": ["a2", "b1", "b2", "g6", "f6", "f7"]},
+            {"fen": "7/3o3/7/3x3/7/7/7 x",           "moves": ["c5", "d5", "e5"]},
+            {"fen": "3o3/7/7/3x3/7/7/7 x",           "moves": ["d4c6", "d4d6", "d4e6"]},
+            {"fen": "3o3/7/3x3/3x3/7/7/7 x",         "moves": ["c6", "d6", "e6"]},
+            {"fen": "o4oo/7/x5x/7/7/7/7 x",          "moves": ["f6", "g6"]},
+            {"fen": "7/3o3/7/3x3/7/7/3oo2 x",        "moves": ["d4d2", "d4e2"]},
+            {"fen": "7/7/7/7/7/7/7 x",               "moves": ["None"]}
+        ]
+
+        for position in positions:
+            fen = position["fen"]
+            moves = position["moves"]
+
+            # Greedy player
+            board = ataxx.Board(fen)
+            for _ in range(100):
+                move = ataxx.players.greedy(board)
+                self.assertTrue(str(move) in position["moves"])
 
 if __name__ == '__main__':
     unittest.main()
