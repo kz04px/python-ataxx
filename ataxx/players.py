@@ -61,3 +61,30 @@ def negamax(board, depth, root=True):
         return best_move
     else:
         return best_score
+
+def alphabeta(board, alpha, beta, depth, root=True):
+    if depth == 0:
+        black, white, _, _ = board.count()
+        if board.turn == ataxx.BLACK:
+            return black - white
+        else:
+            return white - black
+
+    best_move = None
+
+    for move in board.legal_moves():
+        nboard = copy.deepcopy(board)
+        nboard.makemove(move)
+        score = -alphabeta(nboard, -beta, -alpha, depth-1, root=False)
+
+        if score > alpha:
+            alpha = score
+            best_move = move
+        if score >= beta:
+            score = beta
+            break
+
+    if root:
+        return best_move
+    else:
+        return alpha
