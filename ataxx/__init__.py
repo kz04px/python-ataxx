@@ -75,8 +75,8 @@ class Board:
     def score(self):
         num_black, num_white, num_gaps, num_empty = self.count()
 
-        black_moves = self.legal_moves(self.BLACK)
-        white_moves = self.legal_moves(self.WHITE)
+        black_moves = self.legal_moves(BLACK)
+        white_moves = self.legal_moves(WHITE)
 
         if len(black_moves) == 0 and len(white_moves) == 0:
             pass
@@ -127,9 +127,9 @@ class Board:
                 board += ' ╠═╬═╬═╬═╬═╬═╬═╣\n'
         board += " ╚═╩═╩═╩═╩═╩═╩═╝\n"
         board += "  a b c d e f g\n"
-        if self.turn == self.BLACK:
+        if self.turn == BLACK:
             board += "Turn: X"
-        elif self.turn == self.WHITE:
+        elif self.turn == WHITE:
             board += "Turn: O"
         else:
             board += "Turn: ?"
