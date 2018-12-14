@@ -69,3 +69,11 @@ False
 ('a7b5', None)
 >>> engine.quit()
 ```
+
+* Simple players
+```Python3
+>>> import ataxx.players
+>>> board = ataxx.Board()
+>>> ataxx.players.greedy(board)
+<ataxx.Move object at 0x7f7747e28860>
+```
