@@ -196,7 +196,15 @@ class TestMethods(unittest.TestCase):
             pgn.headers["Result"] = board.result()
             pgn.from_board(board)
 
-            self.assertTrue(str(ataxx.pgn.parse(str(pgn))) == str(pgn))
+            # Human readable pgn string
+            pgn_string = str(pgn)
+
+            # Test: pgn string ---> pgn ---> pgn string
+            self.assertTrue(str(ataxx.pgn.parse(pgn_string)) == pgn_string)
+
+            # Check the pgn main line matches the board
+            moves = [n.move for n in pgn.main_line()]
+            self.assertTrue(moves == board.main_line())
 
 if __name__ == '__main__':
     unittest.main()
