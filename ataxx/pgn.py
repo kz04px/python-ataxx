@@ -96,6 +96,16 @@ def parse(string):
 
     return game
 
+class MainLine():
+    def __init__(self, start):
+        self.start = start
+
+    def __iter__(self):
+        node = self.start
+        while node.children:
+            node = node.children[0]
+            yield node
+
 class Node():
     def __init__(self):
         # Tree
@@ -120,6 +130,9 @@ class Node():
         node.annotation = annotation
         self.children.insert(0, node)
 
+    def main_line(self):
+        return MainLine(self)
+
 class Game():
     def __init__(self):
         self.headers = {}
@@ -131,6 +144,9 @@ class Game():
         for move in board.history:
             node.add_main_variation(move)
             node = node.children[0]
+
+    def main_line(self):
+        return self.root.main_line()
 
     def recurse(self, children=[], depth=1):
         if children == []:
