@@ -367,7 +367,7 @@ class Board:
 
     def result(self):
         if not self.gameover():
-            return None
+            return "*"
 
         num_black, num_white, num_gaps, num_empty = self.count()
 
