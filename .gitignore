@@ -1,2 +1,8 @@
 
 ataxx/__pycache__/
+
+ataxx\.egg-info/
+
+dist/
+
+build/
