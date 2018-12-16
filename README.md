@@ -1,7 +1,7 @@
 # python-ataxx: A Python library for the board game Ataxx
 
 ## About
-python-ataxx is written in Python 3 and suppors basic features as move generation, move validation, engine communication, and board printing.
+python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing.
 
 ## Usage
 ```Python3
