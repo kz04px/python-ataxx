@@ -6,7 +6,7 @@ HIGHLIGHT_SQUARE  = (146, 177, 102)
 LIGHT_SQUARE      = (220, 230, 230)
 DARK_SQUARE       = (140, 160, 170)
 WHITE_PIECE       = (235, 235, 235)
-DARK_PIECE        = (20, 20, 20)
+BLACK_PIECE       = (20, 20, 20)
 
 def board(board, width, height, highlights=[], coordinates=False):
     """
@@ -68,7 +68,7 @@ def board(board, width, height, highlights=[], coordinates=False):
 
             # Draw -- Black piece
             if piece == ataxx.BLACK:
-                draw.ellipse([top_left_piece, bottom_right_piece], fill=DARK_PIECE, outline="black")
+                draw.ellipse([top_left_piece, bottom_right_piece], fill=BLACK_PIECE, outline="black")
             # Draw -- white piece
             elif piece == ataxx.WHITE:
                 draw.ellipse([top_left_piece, bottom_right_piece], fill=WHITE_PIECE, outline="black")
