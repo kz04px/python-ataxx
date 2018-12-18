@@ -144,6 +144,7 @@ class Game():
         for move in board.history:
             node.add_main_variation(move)
             node = node.children[0]
+        self.headers["Result"] = board.result()
 
     def main_line(self):
         return self.root.main_line()
