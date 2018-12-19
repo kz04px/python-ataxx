@@ -122,6 +122,7 @@ class Node():
         node.comment = comment
         node.annotation = annotation
         self.children.append(node)
+        return node
 
     def add_main_variation(self, move, comment=None, annotation=None):
         node = Node()
@@ -129,15 +130,30 @@ class Node():
         node.comment = comment
         node.annotation = annotation
         self.children.insert(0, node)
+        return node
 
     def main_line(self):
         return MainLine(self)
+
+    def end(self):
+        node = self
+        while node.children:
+            node = node.children[0]
+        return node
 
 class Game():
     def __init__(self):
         self.headers = {}
         self.headers["Event"] = "Example"
         self.root = Node()
+
+    def add_variation(self, move, comment=None, annotation=None):
+        node = Node()
+        node.move = move
+        node.comment = comment
+        node.annotation = annotation
+        self.root.end().children.append(node)
+        return node
 
     def from_board(self, board):
         node = self.root

@@ -230,8 +230,11 @@ class TestMethods(unittest.TestCase):
 
         # Create a pgn ourselves
         game = ataxx.pgn.Game()
-        game.headers["FEN"] = ""
-        node = game.add_variation(ataxx)
+        game.headers["FEN"] = ataxx.FEN_STARTPOS
+        game.headers["Result"] = "*"
+        node = game.add_variation(ataxx.Move.from_san("g2"), comment="First move")
+        node = node.add_variation(ataxx.Move.from_san("a1a3"), comment="Second move")
+        self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
 
 if __name__ == '__main__':
     unittest.main()
