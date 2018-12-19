@@ -229,10 +229,10 @@ class Board:
 
             if c in "1234567":
                 sq = sq + int(c)
-            elif c in ['x', 'X']:
+            elif c in "bBxX":
                 self.set(x, y, BLACK)
                 sq = sq + 1
-            elif c in ['o', 'O']:
+            elif c in "wWoO":
                 self.set(x, y, WHITE)
                 sq = sq + 1
             elif c in ['-']:
