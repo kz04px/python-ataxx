@@ -3,6 +3,7 @@ import ataxx.players
 import ataxx.pgn
 import random
 import string
+import copy
 import unittest
 
 class TestMethods(unittest.TestCase):
@@ -49,7 +50,7 @@ class TestMethods(unittest.TestCase):
             for move in board.legal_moves():
                 self.assertTrue(move.is_single() != move.is_double())
 
-    def test_parse_san(self):
+    def test_from_san(self):
         fens = [
             "x5o/7/7/7/7/7/o5x x",
             "x5o/7/2-1-2/7/2-1-2/7/o5x o",
@@ -60,7 +61,28 @@ class TestMethods(unittest.TestCase):
         for fen in fens:
             board = ataxx.Board(fen)
             for move in board.legal_moves():
-                self.assertTrue(board.parse_san(str(move)) == move)
+                self.assertTrue(ataxx.Move.from_san(str(move)) == move)
+
+    def test_null_move(self):
+        nullmove = ataxx.Move.null()
+
+        self.assertTrue(nullmove == ataxx.Move(-1, -1, -1, -1))
+        self.assertTrue(nullmove == ataxx.Move.null())
+        self.assertTrue(nullmove != ataxx.Move(0, 0, 0, 0))
+        self.assertTrue(str(nullmove) == "0000")
+
+        board1 = ataxx.Board()
+        board2 = ataxx.Board()
+
+        # Make the null move
+        board2.makemove(nullmove)
+
+        pieces1, turn1 = board1.get_fen().split(" ")
+        pieces2, turn2 = board2.get_fen().split(" ")
+
+        # Check changes made
+        self.assertTrue(pieces1 == pieces2)
+        self.assertTrue(turn1 != turn2)
 
     def test_single_equality(self):
         nums = [0,1,2,3,4,5,6]
@@ -205,6 +227,11 @@ class TestMethods(unittest.TestCase):
             # Check the pgn main line matches the board
             moves = [n.move for n in pgn.main_line()]
             self.assertTrue(moves == board.main_line())
+
+        # Create a pgn ourselves
+        game = ataxx.pgn.Game()
+        game.headers["FEN"] = ""
+        node = game.add_variation(ataxx)
 
 if __name__ == '__main__':
     unittest.main()

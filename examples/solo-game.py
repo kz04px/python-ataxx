@@ -15,7 +15,7 @@ def main():
         print(board)
         try:
             move_string = input("Move: ")
-            move = board.parse_san(move_string)
+            move = ataxx.Move.from_san(move_string)
             if board.is_legal(move):
                 board.makemove(move)
             else:

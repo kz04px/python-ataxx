@@ -23,7 +23,7 @@ def parse_moves(board, parent, q):
             node = Node()
 
             # Get the move
-            move = board.parse_san(word)
+            move = ataxx.Move.from_san(word)
 
             # Fill the node
             node.move = move

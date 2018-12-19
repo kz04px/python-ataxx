@@ -15,6 +15,41 @@ class Move:
         self.to_y = to_y
         self.flipped = [False]*8
 
+    @classmethod
+    def from_san(cls, san):
+        if san == "0000":
+            return cls.null()
+        elif len(san) == 2:
+            if san[0] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[1] not in "1234567":
+                raise Exception(F"ValueError {san}")
+
+            to_x = ord(san[0]) - ord('a') 
+            to_y = ord(san[1]) - ord('1')
+            return cls(to_x, to_y, to_x, to_y)
+        elif len(san) == 4:
+            if san[0] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[1] not in "1234567":
+                raise Exception(F"ValueError {san}")
+            elif san[2] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[3] not in "1234567":
+                raise Exception(F"ValueError {san}")
+
+            fr_x = ord(san[0]) - ord('a') 
+            fr_y = ord(san[1]) - ord('1')
+            to_x = ord(san[2]) - ord('a') 
+            to_y = ord(san[3]) - ord('1')
+            return cls(fr_x, fr_y, to_x, to_y)
+        else:
+            raise Exception(F"ValueError {san}")
+
+    @classmethod
+    def null(cls):
+        return cls(-1, -1, -1, -1)
+
     def is_single(self):
         dX = abs(self.fr_x - self.to_x)
         dY = abs(self.fr_y - self.to_y)
@@ -40,6 +75,10 @@ class Move:
         return not self.__eq__(other)
 
     def __str__(self):
+        # Null move
+        if self == Move.null():
+            return "0000"
+
         if self.is_single():
             return F"{chr(ord('a')+self.to_x)}{self.to_y+1}"
         else:
@@ -222,6 +261,11 @@ class Board:
         else:
             opponent = BLACK
 
+        # Null move
+        if move == Move.null():
+            self.turn = opponent
+            return
+
         self.set(move.to_x, move.to_y, self.turn)
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
@@ -310,44 +354,6 @@ class Board:
             self.undo()
 
         return nodes
-
-    def parse_san(self, san):
-        if type(san) is not str:
-            raise Exception("TypeError")
-
-        if len(san) not in [2, 4]:
-            raise Exception(F"ValueError {san}")
-
-        if len(san) == 2:
-            san += san
-
-        assert len(san) == 4
-
-        # Moves should be given in lowercase
-        # but we'll accept them regardless
-        san = san.lower()
-
-        if san[0] not in "abcdefgABCDEFG":
-            raise Exception(F"ValueError {san}")
-
-        if san[1] not in "1234567":
-            raise Exception(F"ValueError {san}")
-
-        if san[2] not in "abcdefgABCDEFG":
-            raise Exception(F"ValueError {san}")
-
-        if san[3] not in "1234567":
-            raise Exception(F"ValueError {san}")
-
-        fr_x = ord(san[0]) - ord('a') 
-        fr_y = ord(san[1]) - ord('1')
-        to_x = ord(san[2]) - ord('a')
-        to_y = ord(san[3]) - ord('1')
-
-        if fr_x < 0 or fr_x >= self.w or fr_y < 0 or fr_y >= self.h:
-            raise Exception(F"ValueError {san}")
-
-        return Move(fr_x, fr_y, to_x, to_y)
 
     def gameover(self):
         if self.fifty_move_draw():

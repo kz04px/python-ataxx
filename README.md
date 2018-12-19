@@ -7,8 +7,8 @@ python-ataxx is written in Python 3 and supports basic features such as move gen
 ```Python3
 >>> import ataxx
 >>> board = ataxx.Board()
->>> board.makemove(ataxx.parse_san("g2"))
->>> board.makemove(ataxx.parse_san("a7a5"))
+>>> board.makemove(ataxx.Move.from_san("g2"))
+>>> board.makemove(ataxx.Move.from_san("a7a5"))
 >>> board.get_fen()
 '6o/7/o6/7/7/6x/o5x x'
 ```
