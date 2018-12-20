@@ -3,8 +3,6 @@ import random
 
 def random_move(board):
     moves = board.legal_moves()
-    if moves == []:
-        return None
     return random.choice(moves)
 
 def greedy(board):
@@ -29,10 +27,6 @@ def greedy(board):
 
         if score == most:
             moves.append(move)
-
-    # No legal moves
-    if moves == []:
-        return None
 
     return random.choice(moves)
 

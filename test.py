@@ -21,11 +21,13 @@ class TestMethods(unittest.TestCase):
 
     def test_perft(self):
         positions = [
-            {"fen": ataxx.FEN_EMPTY,                 "nodes": [1, 0, 0, 0, 0]},
-            {"fen": "x5o/7/7/7/7/7/o5x x",           "nodes": [1, 16, 256, 6460, 155888]},
-            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",   "nodes": [1, 14, 196, 4184, 86528]},
-            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x", "nodes": [1, 14, 196, 4100, 83104]},
-            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "nodes": [1, 16, 256, 5948, 133264]},
+            {"fen": "7/7/7/7/7/7/7 x",                "nodes": [1, 0, 0, 0, 0]},
+            {"fen": "x5o/7/7/7/7/7/o5x x",            "nodes": [1, 16, 256, 6460, 155888]},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",    "nodes": [1, 14, 196, 4184, 86528]},
+            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",  "nodes": [1, 14, 196, 4100, 83104]},
+            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",    "nodes": [1, 16, 256, 5948, 133264]},
+            {"fen": "7/7/7/7/2-----/2-----/2--x1o x", "nodes": [1, 1, 0, 0, 0]},
+            {"fen": "7/7/7/7/2-----/2-----/2--x1o o", "nodes": [1, 1, 0, 0, 0]},
         ]
 
         depth = 4
@@ -142,7 +144,7 @@ class TestMethods(unittest.TestCase):
             {"fen": "3o3/7/3x3/3x3/7/7/7 x",         "moves": ["c6", "d6", "e6"]},
             {"fen": "o4oo/7/x5x/7/7/7/7 x",          "moves": ["f6", "g6"]},
             {"fen": "7/3o3/7/3x3/7/7/3oo2 x",        "moves": ["d4d2", "d4e2"]},
-            {"fen": "7/7/7/7/7/7/7 x",               "moves": ["None"]}
+            {"fen": "7/7/7/7/7/7/7 x",               "moves": ["0000"]}
         ]
 
         for position in positions:
@@ -153,7 +155,7 @@ class TestMethods(unittest.TestCase):
             board = ataxx.Board(fen)
             for _ in range(100):
                 move = ataxx.players.greedy(board)
-                self.assertTrue(str(move) in position["moves"])
+                self.assertTrue(str(move) in moves)
 
     def test_make_undo(self):
         fens = [
@@ -175,6 +177,11 @@ class TestMethods(unittest.TestCase):
                     board.makemove(move)
                     board.undo()
                     self.assertTrue(board.get_fen() == current_fen)
+
+                # Test null move
+                board.makemove(ataxx.Move.null())
+                board.undo()
+                self.assertTrue(board.get_fen() == current_fen)
 
                 # Pick a random move and keep going
                 move = random.choice(board.legal_moves())
@@ -235,6 +242,40 @@ class TestMethods(unittest.TestCase):
         node = game.add_variation(ataxx.Move.from_san("g2"), comment="First move")
         node = node.add_variation(ataxx.Move.from_san("a1a3"), comment="Second move")
         self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
+
+    def test_result(self):
+        positions = [
+            {"fen": "x5o/7/7/7/7/7/o5x x", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x o", "result": "*"},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x x", "result": "*"},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o", "result": "*"},
+            {"fen": "x6/7/7/7/7/7/7 x", "result": "1-0"},
+            {"fen": "x6/7/7/7/7/7/7 o", "result": "1-0"},
+            {"fen": "o6/7/7/7/7/7/7 x", "result": "0-1"},
+            {"fen": "o6/7/7/7/7/7/7 o", "result": "0-1"},
+            {"fen": "1xxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo x", "result": "*"},
+            {"fen": "1xxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo o", "result": "*"},
+            {"fen": "1oooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx x", "result": "*"},
+            {"fen": "1oooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx o", "result": "*"},
+            {"fen": "xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo x", "result": "1-0"},
+            {"fen": "xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo o", "result": "1-0"},
+            {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx x", "result": "0-1"},
+            {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx o", "result": "0-1"},
+        ]
+
+        for position in positions:
+            fen = position["fen"]
+            result = position["result"]
+            board = ataxx.Board(fen)
+
+            # Check the result is right
+            self.assertTrue(board.result() == result)
+
+            # Check that if we double pass (null move) we get a decisive result
+            if result == "*":
+                board.makemove(ataxx.Move.null())
+                board.makemove(ataxx.Move.null())
+                self.assertTrue(board.result() != "*")
 
 if __name__ == '__main__':
     unittest.main()

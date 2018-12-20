@@ -214,7 +214,7 @@ class Board:
             return -1
         if parts[0].count('/') != 6:
             return -2
-        if len(parts[0]) < 16 or len(parts[0]) > 55:
+        if len(parts[0]) < 13 or len(parts[0]) > 55:
             return -3
         if len(parts[1]) != 1:
             return -4
@@ -264,6 +264,9 @@ class Board:
         # Null move
         if move == Move.null():
             self.turn = opponent
+            self.history.append(move)
+            self.halfmove_clock += 1
+            self.turn = opponent
             return
 
         self.set(move.to_x, move.to_y, self.turn)
@@ -290,6 +293,11 @@ class Board:
         them = self.turn
 
         move = self.history.pop()
+        self.halfmove_clock -= 1
+        self.turn = us
+
+        if move == Move.null():
+            return
 
         # Remove the piece we placed
         self.set(move.to_x, move.to_y, EMPTY)
@@ -303,9 +311,6 @@ class Board:
             if val:
                 square = SINGLES[idx]
                 self.set(move.to_x + square[0], move.to_y + square[1], them)
-
-        self.halfmove_clock -= 1
-        self.turn = us
 
     def main_line(self):
         return self.history
@@ -332,7 +337,11 @@ class Board:
                     for n in DOUBLES:
                         if self.get(x+n[0], y+n[1]) == EMPTY:
                             movelist.append(Move(x, y, x+n[0], y+n[1]))
-        return movelist
+
+        if movelist == []:
+            return [Move.null()]
+        else:
+            return movelist
 
     def is_legal(self, move):
         return move in self.legal_moves(full=True)
@@ -342,6 +351,9 @@ class Board:
 
         if depth == 0:
             return 1
+
+        if self.gameover():
+            return 0
 
         if depth == 1:
             return len(movelist)
@@ -366,8 +378,10 @@ class Board:
         if num_empty == 0 or num_black == 0 or num_white == 0:
             return True
 
-        if self.legal_moves() == []:
-            return True
+        if len(self.history) >= 2:
+            *_, second_last, last = self.history
+            if second_last == Move.null() and last == Move.null():
+                return True
 
         return False
 
@@ -375,11 +389,17 @@ class Board:
         if not self.gameover():
             return "*"
 
+        if self.fifty_move_draw():
+            return "1/2-1/2"
+
+        if self.max_length_draw():
+            return "1/2-1/2"
+
         num_black, num_white, num_gaps, num_empty = self.count()
 
         if num_black > num_white:
             return "1-0"
-        elif num_white > num_black:
+        elif num_black < num_white:
             return "0-1"
         else:
             return "1/2-1/2"
