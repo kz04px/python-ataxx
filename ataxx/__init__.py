@@ -273,8 +273,8 @@ class Board:
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
-        for idx, val in enumerate(SINGLES):
-            x, y = move.to_x + val[0], move.to_y + val[1]
+        for idx, (dx, dy) in enumerate(SINGLES):
+            x, y = move.to_x + dx, move.to_y + dy
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
@@ -309,8 +309,8 @@ class Board:
         # Restore the pieces we captured
         for idx, val in enumerate(move.flipped):
             if val:
-                square = SINGLES[idx]
-                self.set(move.to_x + square[0], move.to_y + square[1], them)
+                dx, dy = SINGLES[idx]
+                self.set(move.to_x + dx, move.to_y + dy, them)
 
     def main_line(self):
         return self.history
@@ -324,19 +324,19 @@ class Board:
             for y in range(self.h):
                 # Singles
                 if self.get(x, y) == EMPTY:
-                    for n in SINGLES:
-                        if self.get(x+n[0], y+n[1]) == side:
+                    for dx, dy in SINGLES:
+                        if self.get(x+dx, y+dy) == side:
 
                             if full:
-                                movelist.append(Move(x+n[0], y+n[1], x, y))
+                                movelist.append(Move(x+dx, y+dy, x, y))
                             else:
                                 movelist.append(Move(x, y, x, y))
                                 break
                 # Doubles
                 elif self.get(x, y) == side:
-                    for n in DOUBLES:
-                        if self.get(x+n[0], y+n[1]) == EMPTY:
-                            movelist.append(Move(x, y, x+n[0], y+n[1]))
+                    for dx, dy in DOUBLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            movelist.append(Move(x, y, x+dx, y+dy))
 
         if movelist == []:
             return [Move.null()]
