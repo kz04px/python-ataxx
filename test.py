@@ -3,28 +3,46 @@ import ataxx.players
 import ataxx.pgn
 import random
 import string
+import copy
 import unittest
 
 class TestMethods(unittest.TestCase):
     def test_fen(self):
         fens = [
-            "x5o/7/7/7/7/7/o5x x",
-            "x5o/7/2-1-2/7/2-1-2/7/o5x o",
-            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",
-            "x5o/7/3-3/2-1-2/3-3/7/o5x o"
+            "x5o/7/7/7/7/7/o5x x 0 1",
+            "x5o/7/2-1-2/7/2-1-2/7/o5x o 0 1",
+            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x 0 1",
+            "x5o/7/3-3/2-1-2/3-3/7/o5x o 0 1"
         ]
 
         for fen in fens:
             board = ataxx.Board(fen)
             self.assertTrue(board.get_fen() == fen)
 
+        fens = [
+            "",
+            "a x 0 1",
+            "x5o/7/7/7/7/7/o5x a 0 1",
+            "x5o/7/7/7/7/7/o5x x a 1",
+            "x5o/7/7/7/7/7/o5x x 0 a",
+            "x5o/7/7/7/7/7/o5x x 0 1 a",
+            "x5o/7/7/7/7/7/o5x x -5 1",
+            "x5o/7/7/7/7/7/o5x x 0 -5"
+        ]
+
+        for fen in fens:
+            board = ataxx.Board()
+            self.assertTrue(board.set_fen(fen) != True)
+
     def test_perft(self):
         positions = [
-            {"fen": ataxx.FEN_EMPTY,                 "nodes": [1, 0, 0, 0, 0]},
-            {"fen": "x5o/7/7/7/7/7/o5x x",           "nodes": [1, 16, 256, 6460, 155888]},
-            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",   "nodes": [1, 14, 196, 4184, 86528]},
-            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x", "nodes": [1, 14, 196, 4100, 83104]},
-            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",   "nodes": [1, 16, 256, 5948, 133264]},
+            {"fen": "7/7/7/7/7/7/7 x",                "nodes": [1, 0, 0, 0, 0]},
+            {"fen": "x5o/7/7/7/7/7/o5x x",            "nodes": [1, 16, 256, 6460, 155888]},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o",    "nodes": [1, 14, 196, 4184, 86528]},
+            {"fen": "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",  "nodes": [1, 14, 196, 4100, 83104]},
+            {"fen": "x5o/7/3-3/2-1-2/3-3/7/o5x o",    "nodes": [1, 16, 256, 5948, 133264]},
+            {"fen": "7/7/7/7/2-----/2-----/2--x1o x", "nodes": [1, 1, 0, 0, 0]},
+            {"fen": "7/7/7/7/2-----/2-----/2--x1o o", "nodes": [1, 1, 0, 0, 0]},
         ]
 
         depth = 4
@@ -49,7 +67,7 @@ class TestMethods(unittest.TestCase):
             for move in board.legal_moves():
                 self.assertTrue(move.is_single() != move.is_double())
 
-    def test_parse_san(self):
+    def test_from_san(self):
         fens = [
             "x5o/7/7/7/7/7/o5x x",
             "x5o/7/2-1-2/7/2-1-2/7/o5x o",
@@ -60,7 +78,29 @@ class TestMethods(unittest.TestCase):
         for fen in fens:
             board = ataxx.Board(fen)
             for move in board.legal_moves():
-                self.assertTrue(board.parse_san(str(move)) == move)
+                self.assertTrue(ataxx.Move.from_san(str(move)) == move)
+
+    def test_null_move(self):
+        nullmove = ataxx.Move.null()
+
+        self.assertTrue(nullmove == ataxx.Move(-1, -1, -1, -1))
+        self.assertTrue(nullmove == ataxx.Move.null())
+        self.assertTrue(nullmove != ataxx.Move(0, 0, 0, 0))
+        self.assertTrue(str(nullmove) == "0000")
+
+        board1 = ataxx.Board()
+        board2 = ataxx.Board()
+
+        # Make the null move
+        board2.makemove(nullmove)
+
+        pieces1, turn1, halfmoves1, _ = board1.get_fen().split(" ")
+        pieces2, turn2, halfmoves2, _ = board2.get_fen().split(" ")
+
+        # Check changes made
+        self.assertTrue(pieces1 == pieces2)
+        self.assertTrue(turn1 != turn2)
+        self.assertTrue(int(halfmoves1)+1 == int(halfmoves2))
 
     def test_single_equality(self):
         nums = [0,1,2,3,4,5,6]
@@ -120,7 +160,7 @@ class TestMethods(unittest.TestCase):
             {"fen": "3o3/7/3x3/3x3/7/7/7 x",         "moves": ["c6", "d6", "e6"]},
             {"fen": "o4oo/7/x5x/7/7/7/7 x",          "moves": ["f6", "g6"]},
             {"fen": "7/3o3/7/3x3/7/7/3oo2 x",        "moves": ["d4d2", "d4e2"]},
-            {"fen": "7/7/7/7/7/7/7 x",               "moves": ["None"]}
+            {"fen": "7/7/7/7/7/7/7 x",               "moves": ["0000"]}
         ]
 
         for position in positions:
@@ -131,15 +171,15 @@ class TestMethods(unittest.TestCase):
             board = ataxx.Board(fen)
             for _ in range(100):
                 move = ataxx.players.greedy(board)
-                self.assertTrue(str(move) in position["moves"])
+                self.assertTrue(str(move) in moves)
 
     def test_make_undo(self):
         fens = [
-            "x5o/7/7/7/7/7/o5x x",
-            "x5o/7/2-1-2/7/2-1-2/7/o5x o",
-            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",
-            "x5o/7/3-3/2-1-2/3-3/7/o5x o",
-            "7/3o3/7/3x3/7/7/3oo2 x"
+            "x5o/7/7/7/7/7/o5x x 0 1",
+            "x5o/7/2-1-2/7/2-1-2/7/o5x o 0 1",
+            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x 0 1",
+            "x5o/7/3-3/2-1-2/3-3/7/o5x o 0 1",
+            "7/3o3/7/3x3/7/7/3oo2 x 0 1"
         ]
 
         for fen in fens:
@@ -153,6 +193,11 @@ class TestMethods(unittest.TestCase):
                     board.makemove(move)
                     board.undo()
                     self.assertTrue(board.get_fen() == current_fen)
+
+                # Test null move
+                board.makemove(ataxx.Move.null())
+                board.undo()
+                self.assertTrue(board.get_fen() == current_fen)
 
                 # Pick a random move and keep going
                 move = random.choice(board.legal_moves())
@@ -205,6 +250,104 @@ class TestMethods(unittest.TestCase):
             # Check the pgn main line matches the board
             moves = [n.move for n in pgn.main_line()]
             self.assertTrue(moves == board.main_line())
+
+        # Create a pgn ourselves
+        game = ataxx.pgn.Game()
+        game.headers["FEN"] = ataxx.FEN_STARTPOS
+        game.headers["Result"] = "*"
+        node = game.add_variation(ataxx.Move.from_san("g2"), comment="First move")
+        node = node.add_variation(ataxx.Move.from_san("a1a3"), comment="Second move")
+        self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x 0 1\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
+
+    def test_result(self):
+        positions = [
+            {"fen": "x5o/7/7/7/7/7/o5x x", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x o", "result": "*"},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x x", "result": "*"},
+            {"fen": "x5o/7/2-1-2/7/2-1-2/7/o5x o", "result": "*"},
+            {"fen": "x6/7/7/7/7/7/7 x", "result": "1-0"},
+            {"fen": "x6/7/7/7/7/7/7 o", "result": "1-0"},
+            {"fen": "o6/7/7/7/7/7/7 x", "result": "0-1"},
+            {"fen": "o6/7/7/7/7/7/7 o", "result": "0-1"},
+            {"fen": "1xxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo x", "result": "*"},
+            {"fen": "1xxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo o", "result": "*"},
+            {"fen": "1oooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx x", "result": "*"},
+            {"fen": "1oooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx o", "result": "*"},
+            {"fen": "xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo x", "result": "1-0"},
+            {"fen": "xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo o", "result": "1-0"},
+            {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx x", "result": "0-1"},
+            {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx o", "result": "0-1"},
+            {"fen": "7/7/7/7/7/7/7 o", "result": "1/2-1/2"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 99 0", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 100 0", "result": "1/2-1/2"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 0 400", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 0 401", "result": "1/2-1/2"},
+        ]
+
+        for position in positions:
+            fen = position["fen"]
+            result = position["result"]
+            board = ataxx.Board(fen)
+
+            # Check the result is right
+            self.assertTrue(board.result() == result)
+
+            # Check that if we double pass (null move) we get a decisive result
+            if result == "*":
+                board.makemove(ataxx.Move.null())
+                board.makemove(ataxx.Move.null())
+                self.assertTrue(board.result() != "*")
+
+    def test_counters(self):
+        positions = [
+            {"move": "g1f3", "fen": "x5o/7/7/7/5x1/7/o6 o 1 1"},
+            {"move": "a1c1", "fen": "x5o/7/7/7/5x1/7/2o4 x 2 2"},
+            {"move": "b6",   "fen": "x5o/1x5/7/7/5x1/7/2o4 o 0 2"},
+            {"move": "c1e3", "fen": "x5o/1x5/7/7/4oo1/7/7 x 0 3"},
+            {"move": "0000", "fen": "x5o/1x5/7/7/4oo1/7/7 o 1 3"},
+        ]
+
+        board = ataxx.Board();
+
+        for position in positions:
+            move = position["move"]
+            fen = position["fen"]
+
+            board.makemove(ataxx.Move.from_san(move))
+
+            self.assertTrue(board.get_fen() == fen)
+
+    def test_draws(self):
+        # Check nullmove draw conditions
+        board = ataxx.Board()
+        board.makemove(ataxx.Move.null())
+        board.makemove(ataxx.Move.null())
+        self.assertTrue(board.gameover())
+        self.assertFalse(board.fifty_move_draw())
+        self.assertFalse(board.max_length_draw())
+
+        # Check double move draw conditions
+        board = ataxx.Board()
+        for i in range(500):
+            if i < 50:
+                self.assertFalse(board.gameover())
+                self.assertFalse(board.fifty_move_draw())
+                self.assertFalse(board.max_length_draw())
+            elif i < 400:
+                self.assertTrue(board.gameover())
+                self.assertTrue(board.fifty_move_draw())
+                self.assertFalse(board.max_length_draw())
+            else:
+                self.assertTrue(board.gameover())
+                self.assertTrue(board.fifty_move_draw())
+                self.assertTrue(board.max_length_draw())
+
+            if i % 2 == 0:
+                board.makemove(ataxx.Move.from_san("g1g3"))
+                board.makemove(ataxx.Move.from_san("a1a3"))
+            else:
+                board.makemove(ataxx.Move.from_san("g3g1"))
+                board.makemove(ataxx.Move.from_san("a3a1"))
 
 if __name__ == '__main__':
     unittest.main()

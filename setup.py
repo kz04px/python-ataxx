@@ -12,8 +12,6 @@ setup(
     license = 'MIT',
     description = 'python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing.',
     long_description = readme,
-    author = 'kz04px',
-    author_email = 'None',
     url = 'https://github.com/kz04px/python-ataxx',
     keywords = 'ataxx',
     packages = ['ataxx'],

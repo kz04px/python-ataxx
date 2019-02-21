@@ -23,7 +23,7 @@ def parse_moves(board, parent, q):
             node = Node()
 
             # Get the move
-            move = board.parse_san(word)
+            move = ataxx.Move.from_san(word)
 
             # Fill the node
             node.move = move
@@ -122,6 +122,7 @@ class Node():
         node.comment = comment
         node.annotation = annotation
         self.children.append(node)
+        return node
 
     def add_main_variation(self, move, comment=None, annotation=None):
         node = Node()
@@ -129,9 +130,16 @@ class Node():
         node.comment = comment
         node.annotation = annotation
         self.children.insert(0, node)
+        return node
 
     def main_line(self):
         return MainLine(self)
+
+    def end(self):
+        node = self
+        while node.children:
+            node = node.children[0]
+        return node
 
 class Game():
     def __init__(self):
@@ -139,11 +147,20 @@ class Game():
         self.headers["Event"] = "Example"
         self.root = Node()
 
+    def add_variation(self, move, comment=None, annotation=None):
+        node = Node()
+        node.move = move
+        node.comment = comment
+        node.annotation = annotation
+        self.root.end().children.append(node)
+        return node
+
     def from_board(self, board):
         node = self.root
         for move in board.history:
             node.add_main_variation(move)
             node = node.children[0]
+        self.headers["Result"] = board.result()
 
     def main_line(self):
         return self.root.main_line()

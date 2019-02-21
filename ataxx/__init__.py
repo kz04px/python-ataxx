@@ -2,10 +2,10 @@ BLACK, WHITE, GAP, EMPTY = 0, 1, 2, 3
 SINGLES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 DOUBLES = [(-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -2), (0, 2), (1, -2), (1, 2), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)]
 # Some standard positions
-FEN_STARTPOS = "x5o/7/7/7/7/7/o5x x"
-FEN_4CORNERS = "x5o/7/2-1-2/7/2-1-2/7/o5x x"
-FEN_4SIDES   = "x5o/7/3-3/2-1-2/3-3/7/o5x x"
-FEN_EMPTY    = "7/7/7/7/7/7/7 x"
+FEN_STARTPOS = "x5o/7/7/7/7/7/o5x x 0 1"
+FEN_4CORNERS = "x5o/7/2-1-2/7/2-1-2/7/o5x x 0 1"
+FEN_4SIDES   = "x5o/7/3-3/2-1-2/3-3/7/o5x x 0 1"
+FEN_EMPTY    = "7/7/7/7/7/7/7 x 0 1"
 
 class Move:
     def __init__(self, fr_x, fr_y, to_x, to_y):
@@ -14,6 +14,41 @@ class Move:
         self.to_x = to_x
         self.to_y = to_y
         self.flipped = [False]*8
+
+    @classmethod
+    def from_san(cls, san):
+        if san == "0000":
+            return cls.null()
+        elif len(san) == 2:
+            if san[0] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[1] not in "1234567":
+                raise Exception(F"ValueError {san}")
+
+            to_x = ord(san[0]) - ord('a') 
+            to_y = ord(san[1]) - ord('1')
+            return cls(to_x, to_y, to_x, to_y)
+        elif len(san) == 4:
+            if san[0] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[1] not in "1234567":
+                raise Exception(F"ValueError {san}")
+            elif san[2] not in "abcdefgABCDEFG":
+                raise Exception(F"ValueError {san}")
+            elif san[3] not in "1234567":
+                raise Exception(F"ValueError {san}")
+
+            fr_x = ord(san[0]) - ord('a') 
+            fr_y = ord(san[1]) - ord('1')
+            to_x = ord(san[2]) - ord('a') 
+            to_y = ord(san[3]) - ord('1')
+            return cls(fr_x, fr_y, to_x, to_y)
+        else:
+            raise Exception(F"ValueError {san}")
+
+    @classmethod
+    def null(cls):
+        return cls(-1, -1, -1, -1)
 
     def is_single(self):
         dX = abs(self.fr_x - self.to_x)
@@ -40,6 +75,10 @@ class Move:
         return not self.__eq__(other)
 
     def __str__(self):
+        # Null move
+        if self == Move.null():
+            return "0000"
+
         if self.is_single():
             return F"{chr(ord('a')+self.to_x)}{self.to_y+1}"
         else:
@@ -52,6 +91,9 @@ class Board:
         self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
         self.turn = BLACK
         self.halfmove_clock = 0
+        self.fullmove_clock = 0
+        self.history = []
+        self.halfmove_stack = []
 
         for y in range(self.w):
             for x in range(self.h):
@@ -66,10 +108,10 @@ class Board:
         self.board[x+2][y+2] = n
 
     def fifty_move_draw(self):
-        return False
+        return self.halfmove_clock >= 100
 
     def max_length_draw(self):
-        return self.halfmove_clock >= 400
+        return self.fullmove_clock > 400
 
     def score(self):
         num_black, num_white, num_gaps, num_empty = self.count()
@@ -161,6 +203,10 @@ class Board:
         else:
             fen += ' x'
 
+        fen += ' ' + str(self.halfmove_clock)
+
+        fen += ' ' + str(self.fullmove_clock)
+
         return fen
 
     def set_fen(self, fen):
@@ -171,14 +217,22 @@ class Board:
 
         parts = fen.split(' ')
 
-        if len(parts) != 2:
+        if len(parts) < 2 or len(parts) > 4:
             return -1
         if parts[0].count('/') != 6:
             return -2
-        if len(parts[0]) < 16 or len(parts[0]) > 55:
+        if len(parts[0]) < 13 or len(parts[0]) > 55:
             return -3
         if len(parts[1]) != 1:
             return -4
+
+        # Add halfmove counter
+        if len(parts) < 3:
+            parts.append("0")
+
+        # Add fullmove counter
+        if len(parts) < 4:
+            parts.append("1")
 
         for x in range(self.w):
             for y in range(self.h):
@@ -190,10 +244,10 @@ class Board:
 
             if c in "1234567":
                 sq = sq + int(c)
-            elif c in ['x', 'X']:
+            elif c in "bBxX":
                 self.set(x, y, BLACK)
                 sq = sq + 1
-            elif c in ['o', 'O']:
+            elif c in "wWoO":
                 self.set(x, y, WHITE)
                 sq = sq + 1
             elif c in ['-']:
@@ -211,8 +265,17 @@ class Board:
         else:
             return -6
 
+        if parts[2].isdigit():
+            self.halfmove_clock = int(parts[2])
+        else:
+            return -7
+
+        if parts[3].isdigit():
+            self.fullmove_clock = int(parts[3])
+        else:
+            return -8
+
         self.history = []
-        self.halfmove_clock = 0
 
         return True
 
@@ -222,21 +285,38 @@ class Board:
         else:
             opponent = BLACK
 
+        self.halfmove_stack.append(self.halfmove_clock)
+
+        if self.turn == WHITE:
+            self.fullmove_clock += 1
+
+        # Null move
+        if move == Move.null():
+            self.turn = opponent
+            self.history.append(move)
+            self.halfmove_clock += 1
+            return
+
         self.set(move.to_x, move.to_y, self.turn)
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
-        for idx, val in enumerate(SINGLES):
-            x, y = move.to_x + val[0], move.to_y + val[1]
+        captures = False
+
+        for idx, (dx, dy) in enumerate(SINGLES):
+            x, y = move.to_x + dx, move.to_y + dy
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
+                captures = True
             else:
                 move.flipped[idx] = False
 
         self.history.append(move)
-        self.halfmove_clock += 1
         self.turn = opponent
+        self.halfmove_clock += 1
+        if captures or move.is_single():
+            self.halfmove_clock = 0
 
     def undo(self):
         if self.turn == BLACK:
@@ -245,7 +325,15 @@ class Board:
             us = BLACK
         them = self.turn
 
+        if self.turn == BLACK:
+            self.fullmove_clock -= 1
+
         move = self.history.pop()
+        self.halfmove_clock = self.halfmove_stack.pop()
+        self.turn = us
+
+        if move == Move.null():
+            return
 
         # Remove the piece we placed
         self.set(move.to_x, move.to_y, EMPTY)
@@ -257,11 +345,8 @@ class Board:
         # Restore the pieces we captured
         for idx, val in enumerate(move.flipped):
             if val:
-                square = SINGLES[idx]
-                self.set(move.to_x + square[0], move.to_y + square[1], them)
-
-        self.halfmove_clock -= 1
-        self.turn = us
+                dx, dy = SINGLES[idx]
+                self.set(move.to_x + dx, move.to_y + dy, them)
 
     def main_line(self):
         return self.history
@@ -275,20 +360,24 @@ class Board:
             for y in range(self.h):
                 # Singles
                 if self.get(x, y) == EMPTY:
-                    for n in SINGLES:
-                        if self.get(x+n[0], y+n[1]) == side:
+                    for dx, dy in SINGLES:
+                        if self.get(x+dx, y+dy) == side:
 
                             if full:
-                                movelist.append(Move(x+n[0], y+n[1], x, y))
+                                movelist.append(Move(x+dx, y+dy, x, y))
                             else:
                                 movelist.append(Move(x, y, x, y))
                                 break
                 # Doubles
                 elif self.get(x, y) == side:
-                    for n in DOUBLES:
-                        if self.get(x+n[0], y+n[1]) == EMPTY:
-                            movelist.append(Move(x, y, x+n[0], y+n[1]))
-        return movelist
+                    for dx, dy in DOUBLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            movelist.append(Move(x, y, x+dx, y+dy))
+
+        if movelist == []:
+            return [Move.null()]
+        else:
+            return movelist
 
     def is_legal(self, move):
         return move in self.legal_moves(full=True)
@@ -298,6 +387,9 @@ class Board:
 
         if depth == 0:
             return 1
+
+        if self.gameover():
+            return 0
 
         if depth == 1:
             return len(movelist)
@@ -311,44 +403,6 @@ class Board:
 
         return nodes
 
-    def parse_san(self, san):
-        if type(san) is not str:
-            raise Exception("TypeError")
-
-        if len(san) not in [2, 4]:
-            raise Exception(F"ValueError {san}")
-
-        if len(san) == 2:
-            san += san
-
-        assert len(san) == 4
-
-        # Moves should be given in lowercase
-        # but we'll accept them regardless
-        san = san.lower()
-
-        if san[0] not in "abcdefgABCDEFG":
-            raise Exception(F"ValueError {san}")
-
-        if san[1] not in "1234567":
-            raise Exception(F"ValueError {san}")
-
-        if san[2] not in "abcdefgABCDEFG":
-            raise Exception(F"ValueError {san}")
-
-        if san[3] not in "1234567":
-            raise Exception(F"ValueError {san}")
-
-        fr_x = ord(san[0]) - ord('a') 
-        fr_y = ord(san[1]) - ord('1')
-        to_x = ord(san[2]) - ord('a')
-        to_y = ord(san[3]) - ord('1')
-
-        if fr_x < 0 or fr_x >= self.w or fr_y < 0 or fr_y >= self.h:
-            raise Exception(F"ValueError {san}")
-
-        return Move(fr_x, fr_y, to_x, to_y)
-
     def gameover(self):
         if self.fifty_move_draw():
             return True
@@ -360,8 +414,10 @@ class Board:
         if num_empty == 0 or num_black == 0 or num_white == 0:
             return True
 
-        if self.legal_moves() == []:
-            return True
+        if len(self.history) >= 2:
+            *_, second_last, last = self.history
+            if second_last == Move.null() and last == Move.null():
+                return True
 
         return False
 
@@ -369,11 +425,17 @@ class Board:
         if not self.gameover():
             return "*"
 
+        if self.fifty_move_draw():
+            return "1/2-1/2"
+
+        if self.max_length_draw():
+            return "1/2-1/2"
+
         num_black, num_white, num_gaps, num_empty = self.count()
 
         if num_black > num_white:
             return "1-0"
-        elif num_white > num_black:
+        elif num_black < num_white:
             return "0-1"
         else:
             return "1/2-1/2"
