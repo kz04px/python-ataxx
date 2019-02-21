@@ -267,7 +267,6 @@ class Board:
             self.turn = opponent
             self.history.append(move)
             self.halfmove_clock += 1
-            self.turn = opponent
             return
 
         self.set(move.to_x, move.to_y, self.turn)
