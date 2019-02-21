@@ -277,6 +277,11 @@ class TestMethods(unittest.TestCase):
             {"fen": "xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo o", "result": "1-0"},
             {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx x", "result": "0-1"},
             {"fen": "ooooooo/ooooooo/ooooooo/ooooxxx/xxxxxxx/xxxxxxx/xxxxxxx o", "result": "0-1"},
+            {"fen": "7/7/7/7/7/7/7 o", "result": "1/2-1/2"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 99 0", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 100 0", "result": "1/2-1/2"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 0 400", "result": "*"},
+            {"fen": "x5o/7/7/7/7/7/o5x x 0 401", "result": "1/2-1/2"},
         ]
 
         for position in positions:
@@ -293,7 +298,7 @@ class TestMethods(unittest.TestCase):
                 board.makemove(ataxx.Move.null())
                 self.assertTrue(board.result() != "*")
 
-    def test_result(self):
+    def test_counters(self):
         positions = [
             {"move": "g1f3", "fen": "x5o/7/7/7/5x1/7/o6 o 1 1"},
             {"move": "a1c1", "fen": "x5o/7/7/7/5x1/7/2o4 x 2 2"},
