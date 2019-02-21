@@ -1,6 +1,11 @@
+__author__ = "kz04px"
+__url__ = "https://github.com/kz04px/python-ataxx"
+__version__ = "1.1.0"
+
 BLACK, WHITE, GAP, EMPTY = 0, 1, 2, 3
 SINGLES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 DOUBLES = [(-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -2), (0, 2), (1, -2), (1, 2), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)]
+
 # Some standard positions
 FEN_STARTPOS = "x5o/7/7/7/7/7/o5x x 0 1"
 FEN_4CORNERS = "x5o/7/2-1-2/7/2-1-2/7/o5x x 0 1"

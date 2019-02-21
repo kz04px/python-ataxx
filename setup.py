@@ -1,14 +1,14 @@
 from setuptools import setup
 import sys
 
-if sys.version_info < (3, ):
+if sys.version_info < (3, 6):
     raise ImportError('Python 2 is not supported. Consider upgrading to Python 3.')
 
 readme = open('README.md').read()
 
 setup(
     name = 'ataxx',
-    version = '1.0',
+    version = '1.1.0',
     license = 'MIT',
     description = 'python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing.',
     long_description = readme,
