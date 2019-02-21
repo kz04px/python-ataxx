@@ -108,10 +108,10 @@ class Board:
         self.board[x+2][y+2] = n
 
     def fifty_move_draw(self):
-        return False
+        return self.halfmove_clock >= 100
 
     def max_length_draw(self):
-        return self.halfmove_clock >= 400
+        return self.fullmove_clock > 400
 
     def score(self):
         num_black, num_white, num_gaps, num_empty = self.count()
@@ -315,7 +315,7 @@ class Board:
         self.history.append(move)
         self.turn = opponent
         self.halfmove_clock += 1
-        if captures:
+        if captures or move.is_single():
             self.halfmove_clock = 0
 
     def undo(self):
