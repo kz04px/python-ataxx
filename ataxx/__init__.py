@@ -91,7 +91,9 @@ class Board:
         self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
         self.turn = BLACK
         self.halfmove_clock = 0
+        self.fullmove_clock = 0
         self.history = []
+        self.halfmove_stack = []
 
         for y in range(self.w):
             for x in range(self.h):
@@ -201,6 +203,10 @@ class Board:
         else:
             fen += ' x'
 
+        fen += ' ' + str(self.halfmove_clock)
+
+        fen += ' ' + str(self.fullmove_clock)
+
         return fen
 
     def set_fen(self, fen):
@@ -211,7 +217,7 @@ class Board:
 
         parts = fen.split(' ')
 
-        if len(parts) != 2:
+        if len(parts) < 2 or len(parts) > 4:
             return -1
         if parts[0].count('/') != 6:
             return -2
@@ -219,6 +225,14 @@ class Board:
             return -3
         if len(parts[1]) != 1:
             return -4
+
+        # Add halfmove counter
+        if len(parts) < 3:
+            parts.append("0")
+
+        # Add fullmove counter
+        if len(parts) < 4:
+            parts.append("1")
 
         for x in range(self.w):
             for y in range(self.h):
@@ -251,8 +265,17 @@ class Board:
         else:
             return -6
 
+        if parts[2].isdigit():
+            self.halfmove_clock = int(parts[2])
+        else:
+            return -7
+
+        if parts[3].isdigit():
+            self.fullmove_clock = int(parts[3])
+        else:
+            return -8
+
         self.history = []
-        self.halfmove_clock = 0
 
         return True
 
@@ -261,6 +284,11 @@ class Board:
             opponent = WHITE
         else:
             opponent = BLACK
+
+        self.halfmove_stack.append(self.halfmove_clock)
+
+        if self.turn == WHITE:
+            self.fullmove_clock += 1
 
         # Null move
         if move == Move.null():
@@ -273,17 +301,22 @@ class Board:
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
+        captures = False
+
         for idx, (dx, dy) in enumerate(SINGLES):
             x, y = move.to_x + dx, move.to_y + dy
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
+                captures = True
             else:
                 move.flipped[idx] = False
 
         self.history.append(move)
-        self.halfmove_clock += 1
         self.turn = opponent
+        self.halfmove_clock += 1
+        if captures:
+            self.halfmove_clock = 0
 
     def undo(self):
         if self.turn == BLACK:
@@ -292,8 +325,11 @@ class Board:
             us = BLACK
         them = self.turn
 
+        if self.turn == BLACK:
+            self.fullmove_clock -= 1
+
         move = self.history.pop()
-        self.halfmove_clock -= 1
+        self.halfmove_clock = self.halfmove_stack.pop()
         self.turn = us
 
         if move == Move.null():

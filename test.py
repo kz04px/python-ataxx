@@ -9,15 +9,30 @@ import unittest
 class TestMethods(unittest.TestCase):
     def test_fen(self):
         fens = [
-            "x5o/7/7/7/7/7/o5x x",
-            "x5o/7/2-1-2/7/2-1-2/7/o5x o",
-            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",
-            "x5o/7/3-3/2-1-2/3-3/7/o5x o"
+            "x5o/7/7/7/7/7/o5x x 0 1",
+            "x5o/7/2-1-2/7/2-1-2/7/o5x o 0 1",
+            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x 0 1",
+            "x5o/7/3-3/2-1-2/3-3/7/o5x o 0 1"
         ]
 
         for fen in fens:
             board = ataxx.Board(fen)
             self.assertTrue(board.get_fen() == fen)
+
+        fens = [
+            "",
+            "a x 0 1",
+            "x5o/7/7/7/7/7/o5x a 0 1",
+            "x5o/7/7/7/7/7/o5x x a 1",
+            "x5o/7/7/7/7/7/o5x x 0 a",
+            "x5o/7/7/7/7/7/o5x x 0 1 a",
+            "x5o/7/7/7/7/7/o5x x -5 1",
+            "x5o/7/7/7/7/7/o5x x 0 -5"
+        ]
+
+        for fen in fens:
+            board = ataxx.Board()
+            self.assertTrue(board.set_fen(fen) != True)
 
     def test_perft(self):
         positions = [
@@ -79,12 +94,13 @@ class TestMethods(unittest.TestCase):
         # Make the null move
         board2.makemove(nullmove)
 
-        pieces1, turn1 = board1.get_fen().split(" ")
-        pieces2, turn2 = board2.get_fen().split(" ")
+        pieces1, turn1, halfmoves1, _ = board1.get_fen().split(" ")
+        pieces2, turn2, halfmoves2, _ = board2.get_fen().split(" ")
 
         # Check changes made
         self.assertTrue(pieces1 == pieces2)
         self.assertTrue(turn1 != turn2)
+        self.assertTrue(int(halfmoves1)+1 == int(halfmoves2))
 
     def test_single_equality(self):
         nums = [0,1,2,3,4,5,6]
@@ -159,11 +175,11 @@ class TestMethods(unittest.TestCase):
 
     def test_make_undo(self):
         fens = [
-            "x5o/7/7/7/7/7/o5x x",
-            "x5o/7/2-1-2/7/2-1-2/7/o5x o",
-            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x",
-            "x5o/7/3-3/2-1-2/3-3/7/o5x o",
-            "7/3o3/7/3x3/7/7/3oo2 x"
+            "x5o/7/7/7/7/7/o5x x 0 1",
+            "x5o/7/2-1-2/7/2-1-2/7/o5x o 0 1",
+            "x5o/7/2-1-2/3-3/2-1-2/7/o5x x 0 1",
+            "x5o/7/3-3/2-1-2/3-3/7/o5x o 0 1",
+            "7/3o3/7/3x3/7/7/3oo2 x 0 1"
         ]
 
         for fen in fens:
@@ -276,6 +292,24 @@ class TestMethods(unittest.TestCase):
                 board.makemove(ataxx.Move.null())
                 board.makemove(ataxx.Move.null())
                 self.assertTrue(board.result() != "*")
+
+    def test_result(self):
+        positions = [
+            {"move": "g1f3", "fen": "x5o/7/7/7/5x1/7/o6 o 1 1"},
+            {"move": "a1c1", "fen": "x5o/7/7/7/5x1/7/2o4 x 2 2"},
+            {"move": "b6",   "fen": "x5o/1x5/7/7/5x1/7/2o4 o 3 2"},
+            {"move": "c1e3", "fen": "x5o/1x5/7/7/4oo1/7/7 x 0 3"},
+        ]
+
+        board = ataxx.Board();
+
+        for position in positions:
+            move = position["move"]
+            fen = position["fen"]
+
+            board.makemove(ataxx.Move.from_san(move))
+
+            self.assertTrue(board.get_fen() == fen)
 
 if __name__ == '__main__':
     unittest.main()
