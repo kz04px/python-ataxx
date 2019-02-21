@@ -91,6 +91,7 @@ class Board:
         self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
         self.turn = BLACK
         self.halfmove_clock = 0
+        self.history = []
 
         for y in range(self.w):
             for x in range(self.h):
