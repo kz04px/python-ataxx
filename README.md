@@ -10,7 +10,7 @@ python-ataxx is written in Python 3 and supports basic features such as move gen
 >>> board.makemove(ataxx.Move.from_san("g2"))
 >>> board.makemove(ataxx.Move.from_san("a7a5"))
 >>> board.get_fen()
-'6o/7/o6/7/7/6x/o5x x'
+'6o/7/o6/7/7/6x/o5x x 1 2'
 ```
 
 ## Features
@@ -74,6 +74,22 @@ False
 ```Python3
 >>> import ataxx.players
 >>> board = ataxx.Board()
->>> ataxx.players.greedy(board)
-<ataxx.Move object at 0x7f7747e28860>
+>>> move = ataxx.players.greedy(board)
+>>> print(move)
+f2
+```
+
+* PGN writing
+```Python3
+>>> import ataxx.pgn
+>>> board = ataxx.Board()
+>>> board.makemove(ataxx.Move.from_san("a7c5"))
+>>> board.makemove(ataxx.Move.from_san("b2"))
+>>> game = ataxx.pgn.Game()
+>>> game.from_board(board)
+>>> print(game)
+[Event "Example"]
+[Result "*"]
+
+1. a7c5 b2 *
 ```
