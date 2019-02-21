@@ -2,10 +2,10 @@ BLACK, WHITE, GAP, EMPTY = 0, 1, 2, 3
 SINGLES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 DOUBLES = [(-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -2), (0, 2), (1, -2), (1, 2), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)]
 # Some standard positions
-FEN_STARTPOS = "x5o/7/7/7/7/7/o5x x"
-FEN_4CORNERS = "x5o/7/2-1-2/7/2-1-2/7/o5x x"
-FEN_4SIDES   = "x5o/7/3-3/2-1-2/3-3/7/o5x x"
-FEN_EMPTY    = "7/7/7/7/7/7/7 x"
+FEN_STARTPOS = "x5o/7/7/7/7/7/o5x x 0 1"
+FEN_4CORNERS = "x5o/7/2-1-2/7/2-1-2/7/o5x x 0 1"
+FEN_4SIDES   = "x5o/7/3-3/2-1-2/3-3/7/o5x x 0 1"
+FEN_EMPTY    = "7/7/7/7/7/7/7 x 0 1"
 
 class Move:
     def __init__(self, fr_x, fr_y, to_x, to_y):

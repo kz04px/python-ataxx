@@ -257,7 +257,7 @@ class TestMethods(unittest.TestCase):
         game.headers["Result"] = "*"
         node = game.add_variation(ataxx.Move.from_san("g2"), comment="First move")
         node = node.add_variation(ataxx.Move.from_san("a1a3"), comment="Second move")
-        self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
+        self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x 0 1\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
 
     def test_result(self):
         positions = [
