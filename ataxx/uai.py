@@ -71,8 +71,11 @@ class Engine():
     def uainewgame(self):
         self.send_line("uainewgame")
 
-    def position(self, board):
-        self.send_line(F"position fen {board.get_fen()}")
+    def position(self, fen, moves=None):
+        if moves:
+            self.send_line(F"position fen {fen} moves {moves}")
+        else:
+            self.send_line(F"position fen {fen}")
 
     def go(self, times=None, movetime=None, depth=None, nodes=None):
         with self.bestmove_received:
