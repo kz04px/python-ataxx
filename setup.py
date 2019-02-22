@@ -2,7 +2,7 @@ from setuptools import setup
 import sys
 
 if sys.version_info < (3, 6):
-    raise ImportError('Python 2 is not supported. Consider upgrading to Python 3.')
+    raise ImportError('Python 3.6 or greater is required')
 
 readme = open('README.md').read()
 
