@@ -162,6 +162,12 @@ class Game():
             node = node.children[0]
         self.headers["Result"] = board.result()
 
+    def set_white(self, w):
+        self.headers["White"] = w
+
+    def set_black(self, b):
+        self.headers["Black"] = b
+
     def main_line(self):
         return self.root.main_line()
 
