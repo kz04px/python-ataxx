@@ -79,16 +79,26 @@ class Engine():
 
     def go(self, times=None, movetime=None, depth=None, nodes=None):
         with self.bestmove_received:
+            maxwait = 0
+
             if times:
                 btime, wtime, binc, winc = times
                 self.send_line(F"go btime {btime} wtime {wtime} binc {binc} winc {winc}")
+                maxwait = (btime + wtime) / 2.0 # FIXME
             elif movetime:
                 self.send_line(F"go movetime {movetime}")
+                maxwait = movetime
             elif depth:
                 self.send_line(F"go depth {depth}")
+                maxwait = None
             elif nodes:
                 self.send_line(F"go nodes {nodes} simulations {nodes}")
-            self.bestmove_received.wait()
+                maxwait = None
+
+            if maxwait:
+                self.bestmove_received.wait(maxwait)
+            else:
+                self.bestmove_received.wait()
         return self.bestmove, self.ponder
 
     def perft(self, depth):

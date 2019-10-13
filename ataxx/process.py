@@ -29,10 +29,17 @@ class Process():
     def pid(self):
         return self.process.pid()
 
+    def close(self):
+        self.process.wait(timeout=1.0)
+        self.process.stdin.close()
+        self.process.stdout.close()
+
     def terminate(self):
         self.stop.set()
+        self.close()
         return self.process.terminate()
 
     def kill(self):
         self.stop.set()
+        self.close()
         return self.process.kill()
