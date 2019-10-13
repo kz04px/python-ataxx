@@ -32,9 +32,11 @@ class Process():
     def terminate(self):
         self.stop.set()
         self.process.terminate()
-        return self.process.wait(timeout=0.5)
+        self.process.stdout.close()
+        self.process.stdin.close()
+        return self.process.wait()
 
     def kill(self):
         self.stop.set()
         self.process.kill()
-        return self.process.wait(timeout=0.5)
+        return self.process.wait()
