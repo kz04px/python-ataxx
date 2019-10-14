@@ -161,6 +161,7 @@ class Game():
             node.add_main_variation(move)
             node = node.children[0]
         self.headers["Result"] = board.result()
+        self.headers["FEN"] = board.get_fen()
 
     def set_white(self, w):
         self.headers["White"] = w
