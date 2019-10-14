@@ -168,6 +168,9 @@ class Game():
     def set_black(self, b):
         self.headers["Black"] = b
 
+    def set_adjudicated(self, a):
+        self.headers["Adjudicated"] = a
+
     def main_line(self):
         return self.root.main_line()
 
