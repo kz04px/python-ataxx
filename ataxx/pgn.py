@@ -161,6 +161,16 @@ class Game():
             node.add_main_variation(move)
             node = node.children[0]
         self.headers["Result"] = board.result()
+        self.headers["FEN"] = board.get_fen()
+
+    def set_white(self, w):
+        self.headers["White"] = w
+
+    def set_black(self, b):
+        self.headers["Black"] = b
+
+    def set_adjudicated(self, a):
+        self.headers["Adjudicated"] = a
 
     def main_line(self):
         return self.root.main_line()
