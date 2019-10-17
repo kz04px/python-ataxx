@@ -1,10 +1,11 @@
 import threading
 import ataxx
 import ataxx.process
+import ataxx.socket
 
 class Engine():
-    def __init__(self, path):
-        self.process = ataxx.process.Process(path, self)
+    def __init__(self, target, is_socket = False):
+        self.client = ataxx.socket.Socket(target, self) if is_socket else ataxx.process.Process(target, self)
         self.name = None
         self.author = None
 
@@ -16,9 +17,19 @@ class Engine():
         self.bestmove_received = threading.Condition()
 
     def send_line(self, line):
-        return self.process.send_line(line)
+        return self.client.send_line(line)
 
     def recv_line(self, line):
+        if line == None:
+            with self.uaiok_received:
+                self.uaiok_received.notify_all()
+            with self.readyok_received:
+                self.readyok_received.notify_all()
+            with self.bestmove_received:
+                self.bestmove_received.notify_all()
+
+            return
+
         words = line.split(' ')
 
         # FIXME:
@@ -56,7 +67,7 @@ class Engine():
                     self.bestmove_received.notify_all()
 
         else:
-            pass
+            print('"%s" not understood' % line)
 
     def uai(self):
         with self.uaiok_received:
@@ -78,6 +89,8 @@ class Engine():
             self.send_line(F"position fen {fen}")
 
     def go(self, times=None, movetime=None, depth=None, nodes=None):
+        self.bestmove = None
+
         with self.bestmove_received:
             maxwait = 0
 
@@ -99,6 +112,7 @@ class Engine():
                 self.bestmove_received.wait(maxwait)
             else:
                 self.bestmove_received.wait()
+
         return self.bestmove, self.ponder
 
     def perft(self, depth):
@@ -112,4 +126,4 @@ class Engine():
         with self.bestmove_received:
             self.bestmove_received.notify_all()
         self.send_line("quit")
-        self.process.terminate()
+        self.client.terminate()

@@ -99,6 +99,7 @@ class Board:
         self.fullmove_clock = 0
         self.history = []
         self.halfmove_stack = []
+        self.startpos = fen
 
         for y in range(self.w):
             for x in range(self.h):
@@ -219,6 +220,8 @@ class Board:
             fen = FEN_STARTPOS
         elif fen == "empty":
             fen = FEN_EMPTY
+
+        self.startpos = fen
 
         parts = fen.split(' ')
 
