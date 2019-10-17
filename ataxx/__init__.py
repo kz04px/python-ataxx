@@ -323,7 +323,7 @@ class Board:
         self.history.append(move)
         self.turn = opponent
         self.halfmove_clock += 1
-        if captures or move.is_single():
+        if move.is_single():
             self.halfmove_clock = 0
 
     def undo(self):
