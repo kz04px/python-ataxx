@@ -33,8 +33,10 @@ class Engine():
         words = line.split(' ')
 
         # FIXME:
-        if words[0] == "id" and words[1] == "name" and len(words) > 2:
+        if len(words) > 2 and words[0] == "id" and words[1] == "name":
             self.name = words[3:]
+        if len(words) > 2 and words[0] == "id" and words[1] == "author":
+            self.author = ' '.join(words[2:])
 
         if len(words) > 1 and words[0] == "warn":
             print(line)
@@ -57,7 +59,7 @@ class Engine():
             if words[0] == "id" and words[1] == "name":
                 self.name = words[2]
             elif words[0] == "id" and words[1] == "author":
-                self.author = words[2]
+                self.author = ' '.join(words[2:])
 
         elif len(words) == 4:
             if words[0] == "bestmove" and words[2] == "ponder":
@@ -67,7 +69,8 @@ class Engine():
                     self.bestmove_received.notify_all()
 
         else:
-            print('"%s" not understood' % line)
+            #print('"%s" not understood' % line)
+            pass
 
     def uai(self):
         with self.uaiok_received:
