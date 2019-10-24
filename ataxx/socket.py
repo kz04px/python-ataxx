@@ -36,7 +36,7 @@ class Socket():
                     self.engine.recv_line(None)
                     break
 
-                print('received data "%s"' % chunk)
+                #print('received data "%s"' % chunk)
 
                 buffer.extend(chunk)
 
@@ -58,7 +58,7 @@ class Socket():
                 line = line.decode('utf-8').rstrip()
                 buffer = buffer[end + 1:]
 
-            print('line: "%s"' % line)
+            #print('line: "%s"' % line)
 
             self.engine.recv_line(line)
 

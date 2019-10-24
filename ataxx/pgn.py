@@ -162,6 +162,7 @@ class Game():
             node = node.children[0]
         self.headers["Result"] = board.result()
         self.headers["FEN"] = board.startpos
+        self.headers["SetUp"] = "1"
 
     def set_white(self, w):
         self.headers["White"] = w
@@ -246,9 +247,12 @@ class Game():
         return string
 
 class PGNIterator():
-    def __init__(self, path):
-        self.path = path
-        self.iterator = iter(open(self.path))
+    def __init__(self, input_, is_string=False):
+        self.path = input_
+        if is_string:
+            self.iterator = iter(input_)
+        else:
+            self.iterator = iter(open(self.path))
         self.lines = []
 
     def __iter__(self):
@@ -288,8 +292,8 @@ class PGNIterator():
                 self.lines.append(line)
 
 class GameIterator():
-    def __init__(self, path):
-        self.iterator = PGNIterator(path)
+    def __init__(self, path, is_string=False):
+        self.iterator = PGNIterator(path, is_string)
 
     def __iter__(self):
         return self
