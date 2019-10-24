@@ -34,7 +34,7 @@ class Engine():
 
         # FIXME:
         if len(words) > 2 and words[0] == "id" and words[1] == "name":
-            self.name = words[3:]
+            self.name = ' '.join(words[2:])
         if len(words) > 2 and words[0] == "id" and words[1] == "author":
             self.author = ' '.join(words[2:])
 

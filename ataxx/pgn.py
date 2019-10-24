@@ -162,6 +162,7 @@ class Game():
             node = node.children[0]
         self.headers["Result"] = board.result()
         self.headers["FEN"] = board.startpos
+        self.headers["SetUp"] = "1"
 
     def set_white(self, w):
         self.headers["White"] = w
