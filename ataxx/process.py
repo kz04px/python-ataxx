@@ -37,8 +37,8 @@ class Process():
         return self.process.wait()
 
     def kill(self):
-        self.stop.set()
         self.process.kill()
+        self.stop.set()
         self.process.stdout.close()
         self.process.stdin.close()
         return self.process.wait()
