@@ -90,7 +90,7 @@ class Move:
             return F"{chr(ord('a')+self.fr_x)}{self.fr_y+1}{chr(ord('a')+self.to_x)}{self.to_y+1}"
 
 class Board:
-    def __init__(self, fen="startpos"):
+    def __init__(self, fen=FEN_STARTPOS):
         self.w = 7
         self.h = 7
         self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
@@ -216,9 +216,7 @@ class Board:
         return fen
 
     def set_fen(self, fen):
-        if fen == "startpos":
-            fen = FEN_STARTPOS
-        elif fen == "empty":
+        if fen == "empty":
             fen = FEN_EMPTY
 
         self.startpos = fen
@@ -240,7 +238,10 @@ class Board:
 
         # Add fullmove counter
         if len(parts) < 4:
-            parts.append("1")
+            # halfmove clock should not be more than fullmove number
+            halfmove_clock = int(parts[2])
+            fullmove_number = halfmove_clock if halfmove_clock > 0 else 1
+            parts.append(str(fullmove_number))
 
         for x in range(self.w):
             for y in range(self.h):
@@ -283,7 +284,7 @@ class Board:
         else:
             return -8
 
-        self.history = []
+        self.startpos = self.get_fen()
 
         return True
 
@@ -309,14 +310,11 @@ class Board:
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
-        captures = False
-
         for idx, (dx, dy) in enumerate(SINGLES):
             x, y = move.to_x + dx, move.to_y + dy
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
-                captures = True
             else:
                 move.flipped[idx] = False
 
