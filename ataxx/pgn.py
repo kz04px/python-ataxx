@@ -2,6 +2,7 @@ import ataxx
 import queue
 import re
 import copy
+from datetime import datetime
 
 ANNOTATE_BRILLIANT_MOVE = "!!"
 ANNOTATE_GOOD_MOVE      = "!"
@@ -144,7 +145,13 @@ class Node():
 class Game():
     def __init__(self):
         self.headers = {}
-        self.headers["Event"] = "Example"
+        self.headers["Event"] = "?"
+        self.headers["Site"] = "?"
+        self.headers["Date"] = datetime.today().strftime("%Y.%m.%d")
+        self.headers["Round"] = "-"
+        self.headers["White"] = "?"
+        self.headers["Black"] = "?"
+        self.headers["Result"] = '*'
         self.root = Node()
 
     def add_variation(self, move, comment=None, annotation=None):
@@ -161,8 +168,9 @@ class Game():
             node.add_main_variation(move)
             node = node.children[0]
         self.headers["Result"] = board.result()
-        self.headers["FEN"] = board.startpos
-        self.headers["SetUp"] = "1"
+        if board.startpos != ataxx.FEN_STARTPOS:
+            self.headers["FEN"] = board.startpos
+            self.headers["SetUp"] = "1"
 
     def set_white(self, w):
         self.headers["White"] = w
@@ -226,17 +234,8 @@ class Game():
     def __str__(self):
         string = ""
 
-        # Headers -- put "Event" first
-        if "Event" in self.headers.keys():
-            key = "Event"
-            value = self.headers["Event"]
-            string += F"[{key} \"{value}\"]\n"
-
-        # Headers -- put the rest afterwards
         for key, value in self.headers.items():
-            if key == "Event":
-                continue
-            string += F"[{key} \"{value}\"]\n"
+            string += F'[{key} "{value}"]\n'
 
         # One empty line between the headers and the moves
         string += "\n"
