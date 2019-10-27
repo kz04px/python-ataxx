@@ -37,6 +37,6 @@ class Process():
         return self.process.wait()
 
     def kill(self):
-        self.stop.set()
         self.process.kill()
+        self.stop.set()
         return self.process.wait()
