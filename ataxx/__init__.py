@@ -101,13 +101,19 @@ class Board:
         self._board[x+2][y+2] = n
 
     def fifty_move_draw(self):
+        """Return whether the position is drawn by the 50 move rule"""
+
         return self.halfmove_clock >= 100
 
     def score(self):
+        """Return the net piece count from black's perspective"""
+
         num_black, num_white, _, _ = self.count()
         return num_black - num_white
 
     def count(self):
+        """Return the number of black pieces, white pieces, gaps, and empty squares"""
+
         num_black = 0
         num_white = 0
         num_gaps = 0
@@ -156,6 +162,8 @@ class Board:
         return board
 
     def get_fen(self):
+        """Return a fen string for the current position"""
+
         fen = ''
         for y in range(6, -1, -1):
             empty = 0
@@ -189,6 +197,15 @@ class Board:
         return fen
 
     def set_fen(self, fen):
+        """Set the board to a fen string
+
+        Parameters:
+        fen (string): The fen string to use
+
+        Returns:
+        bool:Success parsing the fen
+        """
+
         if fen == "startpos":
             fen = FEN_STARTPOS
         elif fen == "empty":
@@ -278,6 +295,8 @@ class Board:
         return True
 
     def makemove(self, move):
+        """Apply a given move to the board"""
+
         if self.turn == BLACK:
             opponent = WHITE
         else:
@@ -314,6 +333,8 @@ class Board:
             self.halfmove_clock = 0
 
     def undo(self):
+        """Undoes the last move applied to the board"""
+
         if self.turn == BLACK:
             us = WHITE
         else:
@@ -344,12 +365,18 @@ class Board:
                 self.set(move.to_x + dx, move.to_y + dy, them)
 
     def main_line(self):
+        """Return the list of moves that have been applied to the board"""
+
         return self.history
     
     def start_fen(self):
+        """Return the original fen string the board was set to"""
+
         return self._start_fen
 
     def legal_moves(self):
+        """Return the list of legal moves in the current position"""
+
         if self.gameover():
             return []
 
@@ -374,9 +401,27 @@ class Board:
             return movelist
 
     def is_legal(self, move):
+        """Return whether a given move is legal in the current position
+
+        Parameters:
+        move (Move): The move to check
+
+        Returns:
+        bool:Whether the move is legal
+        """
+
         return move in self.legal_moves()
 
     def perft(self, depth, full=False):
+        """Return the number of leaf nodes to a given ply from the current position
+
+        Parameters:
+        depth (int): The number of ply to search to
+
+        Returns:
+        int:The total number of leaf nodes found
+        """
+
         movelist = self.legal_moves()
 
         if depth == 0:
@@ -398,6 +443,8 @@ class Board:
         return nodes
 
     def gameover(self):
+        """Returns whether the game is over"""
+
         # 50 move rule
         if self.fifty_move_draw():
             return True
@@ -423,6 +470,8 @@ class Board:
         return True
 
     def result(self):
+        """Returns the game result for the current position or * if the game is not over"""
+
         if not self.gameover():
             return "*"
 
