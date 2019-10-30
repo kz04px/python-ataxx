@@ -105,9 +105,6 @@ class Board:
     def fifty_move_draw(self):
         return self.halfmove_clock >= 100
 
-    def max_length_draw(self):
-        return self.fullmove_clock > 400
-
     def score(self):
         num_black, num_white, _, _ = self.count()
         return num_black - num_white
@@ -198,8 +195,6 @@ class Board:
             fen = FEN_STARTPOS
         elif fen == "empty":
             fen = FEN_EMPTY
-
-        self.startpos = fen
 
         parts = fen.split(' ')
 
@@ -356,12 +351,9 @@ class Board:
     def start_fen(self):
         return self._start_fen
 
-    def legal_moves(self, side=None, full=False):
+    def legal_moves(self):
         if self.gameover():
             return []
-
-        if side is None:
-            side = self.turn
 
         movelist = []
         for x in range(self.w):
@@ -369,15 +361,11 @@ class Board:
                 # Singles
                 if self.get(x, y) == EMPTY:
                     for dx, dy in SINGLES:
-                        if self.get(x+dx, y+dy) == side:
-
-                            if full:
-                                movelist.append(Move(x+dx, y+dy, x, y))
-                            else:
-                                movelist.append(Move(x, y, x, y))
-                                break
+                        if self.get(x+dx, y+dy) == self.turn:
+                            movelist.append(Move(x, y, x, y))
+                            break
                 # Doubles
-                elif self.get(x, y) == side:
+                elif self.get(x, y) == self.turn:
                     for dx, dy in DOUBLES:
                         if self.get(x+dx, y+dy) == EMPTY:
                             movelist.append(Move(x, y, x+dx, y+dy))
@@ -388,7 +376,7 @@ class Board:
             return movelist
 
     def is_legal(self, move):
-        return move in self.legal_moves(full=True)
+        return move in self.legal_moves()
 
     def perft(self, depth, full=False):
         movelist = self.legal_moves()
@@ -416,10 +404,6 @@ class Board:
         if self.fifty_move_draw():
             return True
 
-        # Max game length
-        if self.max_length_draw():
-            return True
-
         # No pieces left, no gaps left
         num_black, num_white, num_gaps, num_empty = self.count()
         if num_empty == 0 or num_black == 0 or num_white == 0:
@@ -445,9 +429,6 @@ class Board:
             return "*"
 
         if self.fifty_move_draw():
-            return "1/2-1/2"
-
-        if self.max_length_draw():
             return "1/2-1/2"
 
         num_black, num_white, num_gaps, num_empty = self.count()

@@ -9,15 +9,9 @@ class TestMethods(unittest.TestCase):
             if i < 50:
                 self.assertFalse(board.gameover())
                 self.assertFalse(board.fifty_move_draw())
-                self.assertFalse(board.max_length_draw())
-            elif i < 400:
-                self.assertTrue(board.gameover())
-                self.assertTrue(board.fifty_move_draw())
-                self.assertFalse(board.max_length_draw())
             else:
                 self.assertTrue(board.gameover())
                 self.assertTrue(board.fifty_move_draw())
-                self.assertTrue(board.max_length_draw())
 
             if i % 2 == 0:
                 board.makemove(ataxx.Move.from_san("g1g3"))
