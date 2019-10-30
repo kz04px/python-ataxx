@@ -1,10 +1,11 @@
 import threading
 import ataxx
 import ataxx.process
+import ataxx.socket
 
 class Engine():
-    def __init__(self, path):
-        self.process = ataxx.process.Process(path, self)
+    def __init__(self, target, is_socket = False):
+        self.client = ataxx.socket.Socket(target, self) if is_socket else ataxx.process.Process(target, self)
         self.name = None
         self.author = None
 
@@ -16,14 +17,26 @@ class Engine():
         self.bestmove_received = threading.Condition()
 
     def send_line(self, line):
-        return self.process.send_line(line)
+        return self.client.send_line(line)
 
     def recv_line(self, line):
+        if line == None:
+            with self.uaiok_received:
+                self.uaiok_received.notify_all()
+            with self.readyok_received:
+                self.readyok_received.notify_all()
+            with self.bestmove_received:
+                self.bestmove_received.notify_all()
+
+            return
+
         words = line.split(' ')
 
         # FIXME:
-        if words[0] == "id" and words[1] == "name" and len(words) > 2:
-            self.name = words[3:]
+        if len(words) > 2 and words[0] == "id" and words[1] == "name":
+            self.name = ' '.join(words[2:])
+        if len(words) > 2 and words[0] == "id" and words[1] == "author":
+            self.author = ' '.join(words[2:])
 
         if len(words) > 1 and words[0] == "warn":
             print(line)
@@ -46,7 +59,7 @@ class Engine():
             if words[0] == "id" and words[1] == "name":
                 self.name = words[2]
             elif words[0] == "id" and words[1] == "author":
-                self.author = words[2]
+                self.author = ' '.join(words[2:])
 
         elif len(words) == 4:
             if words[0] == "bestmove" and words[2] == "ponder":
@@ -56,6 +69,7 @@ class Engine():
                     self.bestmove_received.notify_all()
 
         else:
+            #print('"%s" not understood' % line)
             pass
 
     def uai(self):
@@ -78,17 +92,30 @@ class Engine():
             self.send_line(F"position fen {fen}")
 
     def go(self, times=None, movetime=None, depth=None, nodes=None):
+        self.bestmove = None
+
         with self.bestmove_received:
+            maxwait = 0
+
             if times:
                 btime, wtime, binc, winc = times
                 self.send_line(F"go btime {btime} wtime {wtime} binc {binc} winc {winc}")
+                maxwait = (btime + wtime) / 2.0 # FIXME
             elif movetime:
                 self.send_line(F"go movetime {movetime}")
+                maxwait = movetime
             elif depth:
                 self.send_line(F"go depth {depth}")
+                maxwait = None
             elif nodes:
                 self.send_line(F"go nodes {nodes} simulations {nodes}")
-            self.bestmove_received.wait()
+                maxwait = None
+
+            if maxwait:
+                self.bestmove_received.wait(maxwait)
+            else:
+                self.bestmove_received.wait()
+
         return self.bestmove, self.ponder
 
     def perft(self, depth):
@@ -102,4 +129,4 @@ class Engine():
         with self.bestmove_received:
             self.bestmove_received.notify_all()
         self.send_line("quit")
-        self.process.terminate()
+        self.client.terminate()

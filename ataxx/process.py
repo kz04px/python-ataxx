@@ -31,8 +31,12 @@ class Process():
 
     def terminate(self):
         self.stop.set()
-        return self.process.terminate()
+        self.process.terminate()
+        self.process.stdout.close()
+        self.process.stdin.close()
+        return self.process.wait()
 
     def kill(self):
         self.stop.set()
-        return self.process.kill()
+        self.process.kill()
+        return self.process.wait()

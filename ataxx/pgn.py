@@ -2,6 +2,7 @@ import ataxx
 import queue
 import re
 import copy
+from datetime import datetime
 
 ANNOTATE_BRILLIANT_MOVE = "!!"
 ANNOTATE_GOOD_MOVE      = "!"
@@ -145,6 +146,12 @@ class Game():
     def __init__(self):
         self.headers = {}
         self.headers["Event"] = "Example"
+        self.headers["Site"] = "?"
+        self.headers["Date"] = datetime.today().strftime("%Y.%m.%d")
+        self.headers["Round"] = "-"
+        self.headers["White"] = "?"
+        self.headers["Black"] = "?"
+        self.headers["Result"] = '*'
         self.root = Node()
 
     def add_variation(self, move, comment=None, annotation=None):
@@ -161,6 +168,18 @@ class Game():
             node.add_main_variation(move)
             node = node.children[0]
         self.headers["Result"] = board.result()
+        if board.startpos != ataxx.FEN_STARTPOS:
+            self.headers["FEN"] = board.startpos
+            self.headers["SetUp"] = "1"
+
+    def set_white(self, w):
+        self.headers["White"] = w
+
+    def set_black(self, b):
+        self.headers["Black"] = b
+
+    def set_adjudicated(self, a):
+        self.headers["Adjudicated"] = a
 
     def main_line(self):
         return self.root.main_line()
@@ -215,17 +234,8 @@ class Game():
     def __str__(self):
         string = ""
 
-        # Headers -- put "Event" first
-        if "Event" in self.headers.keys():
-            key = "Event"
-            value = self.headers["Event"]
-            string += F"[{key} \"{value}\"]\n"
-
-        # Headers -- put the rest afterwards
         for key, value in self.headers.items():
-            if key == "Event":
-                continue
-            string += F"[{key} \"{value}\"]\n"
+            string += F'[{key} "{value}"]\n'
 
         # One empty line between the headers and the moves
         string += "\n"
@@ -236,9 +246,12 @@ class Game():
         return string
 
 class PGNIterator():
-    def __init__(self, path):
-        self.path = path
-        self.iterator = iter(open(self.path))
+    def __init__(self, input_, is_string=False):
+        self.path = input_
+        if is_string:
+            self.iterator = iter(input_)
+        else:
+            self.iterator = iter(open(self.path))
         self.lines = []
 
     def __iter__(self):
@@ -278,8 +291,8 @@ class PGNIterator():
                 self.lines.append(line)
 
 class GameIterator():
-    def __init__(self, path):
-        self.iterator = PGNIterator(path)
+    def __init__(self, path, is_string=False):
+        self.iterator = PGNIterator(path, is_string)
 
     def __iter__(self):
         return self
