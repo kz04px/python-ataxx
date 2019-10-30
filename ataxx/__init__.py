@@ -196,8 +196,6 @@ class Board:
         elif fen == "empty":
             fen = FEN_EMPTY
 
-        self.startpos = fen
-
         parts = fen.split(' ')
 
         if len(parts) < 1 or len(parts) > 4:

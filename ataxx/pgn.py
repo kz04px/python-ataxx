@@ -168,8 +168,8 @@ class Game():
             node.add_main_variation(move)
             node = node.children[0]
         self.headers["Result"] = board.result()
-        if board.startpos != ataxx.FEN_STARTPOS:
-            self.headers["FEN"] = board.startpos
+        if board.start_fen() != ataxx.FEN_STARTPOS:
+            self.headers["FEN"] = board.start_fen()
             self.headers["SetUp"] = "1"
 
     def set_white(self, w):
