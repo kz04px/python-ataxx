@@ -351,12 +351,9 @@ class Board:
     def start_fen(self):
         return self._start_fen
 
-    def legal_moves(self, side=None, full=False):
+    def legal_moves(self):
         if self.gameover():
             return []
-
-        if side is None:
-            side = self.turn
 
         movelist = []
         for x in range(self.w):
@@ -364,15 +361,11 @@ class Board:
                 # Singles
                 if self.get(x, y) == EMPTY:
                     for dx, dy in SINGLES:
-                        if self.get(x+dx, y+dy) == side:
-
-                            if full:
-                                movelist.append(Move(x+dx, y+dy, x, y))
-                            else:
-                                movelist.append(Move(x, y, x, y))
-                                break
+                        if self.get(x+dx, y+dy) == self.turn:
+                            movelist.append(Move(x, y, x, y))
+                            break
                 # Doubles
-                elif self.get(x, y) == side:
+                elif self.get(x, y) == self.turn:
                     for dx, dy in DOUBLES:
                         if self.get(x+dx, y+dy) == EMPTY:
                             movelist.append(Move(x, y, x+dx, y+dy))
@@ -383,7 +376,7 @@ class Board:
             return movelist
 
     def is_legal(self, move):
-        return move in self.legal_moves(full=True)
+        return move in self.legal_moves()
 
     def perft(self, depth, full=False):
         movelist = self.legal_moves()
