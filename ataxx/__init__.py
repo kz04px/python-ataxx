@@ -90,7 +90,7 @@ class Move:
             return F"{chr(ord('a')+self.fr_x)}{self.fr_y+1}{chr(ord('a')+self.to_x)}{self.to_y+1}"
 
 class Board:
-    def __init__(self, fen="startpos"):
+    def __init__(self, fen=FEN_STARTPOS):
         self._board = [[GAP for x in range(7+4)] for y in range(7+4)]
         self.set_fen(fen)
 
