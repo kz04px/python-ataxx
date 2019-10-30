@@ -91,9 +91,7 @@ class Move:
 
 class Board:
     def __init__(self, fen="startpos"):
-        self.w = 7
-        self.h = 7
-        self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
+        self.board = [[GAP for x in range(7+4)] for y in range(7+4)]
         self.set_fen(fen)
 
     def get(self, x, y):
@@ -114,8 +112,8 @@ class Board:
         num_white = 0
         num_gaps = 0
         num_empty = 0
-        for y in range(self.h):
-            for x in range(self.w):
+        for y in range(7):
+            for x in range(7):
                 if self.get(x, y) == BLACK:
                     num_black += 1
                 elif self.get(x, y) == WHITE:
@@ -130,9 +128,9 @@ class Board:
     def __str__(self):
         board = "  a b c d e f g\n"
         board += " ╔═╦═╦═╦═╦═╦═╦═╗\n"
-        for y in range(self.h-1, -1, -1):
+        for y in range(6, -1, -1):
             board += chr(y+49) + '║'
-            for x in range(0, self.w):
+            for x in range(0, 7):
                 if self.get(x, y) == BLACK:
                     board += 'X'
                 elif self.get(x, y) == WHITE:
@@ -159,9 +157,9 @@ class Board:
 
     def get_fen(self):
         fen = ''
-        for y in range(self.h - 1, -1, -1):
+        for y in range(6, -1, -1):
             empty = 0
-            for x in range(self.w):
+            for x in range(7):
                 if self.get(x, y) != EMPTY and empty > 0:
                     fen += str(empty)
                     empty = 0
@@ -208,8 +206,8 @@ class Board:
             return False
 
         # Clear board
-        for x in range(self.w):
-            for y in range(self.h):
+        for x in range(7):
+            for y in range(7):
                 self.set(x, y, EMPTY)
         self.turn = BLACK
         self.halfmove_clock = 0
@@ -232,7 +230,7 @@ class Board:
         # Set board
         sq = 0
         for c in parts[0]:
-            x, y = sq%self.w, self.h - sq//self.h - 1
+            x, y = sq%7, 7 - sq//7 - 1
 
             if c in "1234567":
                 sq = sq + int(c)
@@ -251,7 +249,7 @@ class Board:
                 return False
 
         # We need to have parsed the right number of squares
-        if sq != self.w * self.h:
+        if sq != 7 * 7:
             return False
 
         # Set turn
@@ -356,8 +354,8 @@ class Board:
             return []
 
         movelist = []
-        for x in range(self.w):
-            for y in range(self.h):
+        for x in range(7):
+            for y in range(7):
                 # Singles
                 if self.get(x, y) == EMPTY:
                     for dx, dy in SINGLES:
@@ -410,8 +408,8 @@ class Board:
             return True
 
         # No moves left
-        for x in range(self.w):
-            for y in range(self.h):
+        for x in range(7):
+            for y in range(7):
                 if self.get(x, y) in [BLACK, WHITE]:
                     # Singles
                     for dx, dy in SINGLES:
