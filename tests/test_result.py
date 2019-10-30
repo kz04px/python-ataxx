@@ -24,7 +24,6 @@ class TestMethods(unittest.TestCase):
             ["x5o/7/7/7/7/7/o5x x 99 0", "*"],
             ["x5o/7/7/7/7/7/o5x x 100 0", "1/2-1/2"],
             ["x5o/7/7/7/7/7/o5x x 0 400", "*"],
-            ["x5o/7/7/7/7/7/o5x x 0 401", "1/2-1/2"],
         ]
 
         for fen, result in tests:

@@ -105,9 +105,6 @@ class Board:
     def fifty_move_draw(self):
         return self.halfmove_clock >= 100
 
-    def max_length_draw(self):
-        return self.fullmove_clock > 400
-
     def score(self):
         num_black, num_white, _, _ = self.count()
         return num_black - num_white
@@ -416,10 +413,6 @@ class Board:
         if self.fifty_move_draw():
             return True
 
-        # Max game length
-        if self.max_length_draw():
-            return True
-
         # No pieces left, no gaps left
         num_black, num_white, num_gaps, num_empty = self.count()
         if num_empty == 0 or num_black == 0 or num_white == 0:
@@ -445,9 +438,6 @@ class Board:
             return "*"
 
         if self.fifty_move_draw():
-            return "1/2-1/2"
-
-        if self.max_length_draw():
             return "1/2-1/2"
 
         num_black, num_white, num_gaps, num_empty = self.count()
