@@ -30,7 +30,7 @@ class Move:
             elif san[1] not in "1234567":
                 raise Exception(F"ValueError {san}")
 
-            to_x = ord(san[0]) - ord('a') 
+            to_x = ord(san[0]) - ord('a')
             to_y = ord(san[1]) - ord('1')
             return cls(to_x, to_y, to_x, to_y)
         elif len(san) == 4:
@@ -43,9 +43,9 @@ class Move:
             elif san[3] not in "1234567":
                 raise Exception(F"ValueError {san}")
 
-            fr_x = ord(san[0]) - ord('a') 
+            fr_x = ord(san[0]) - ord('a')
             fr_y = ord(san[1]) - ord('1')
-            to_x = ord(san[2]) - ord('a') 
+            to_x = ord(san[2]) - ord('a')
             to_y = ord(san[3]) - ord('1')
             return cls(fr_x, fr_y, to_x, to_y)
         else:
@@ -368,7 +368,7 @@ class Board:
         """Return the list of moves that have been applied to the board"""
 
         return self.history
-    
+
     def start_fen(self):
         """Return the original fen string the board was set to"""
 
