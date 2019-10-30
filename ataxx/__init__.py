@@ -94,17 +94,6 @@ class Board:
         self.w = 7
         self.h = 7
         self.board = [[GAP for x in range(self.w+4)] for y in range(self.h+4)]
-        self.turn = BLACK
-        self.halfmove_clock = 0
-        self.fullmove_clock = 0
-        self.history = []
-        self.halfmove_stack = []
-        self.startpos = fen
-
-        for y in range(self.w):
-            for x in range(self.h):
-                self.set(x, y, EMPTY)
-
         self.set_fen(fen)
 
     def get(self, x, y):
@@ -120,18 +109,7 @@ class Board:
         return self.fullmove_clock > 400
 
     def score(self):
-        num_black, num_white, num_gaps, num_empty = self.count()
-
-        black_moves = self.legal_moves(BLACK)
-        white_moves = self.legal_moves(WHITE)
-
-        if len(black_moves) == 0 and len(white_moves) == 0:
-            pass
-        elif len(black_moves) == 0:
-            num_white += num_empty;
-        elif len(white_moves) == 0:
-            num_black += num_empty;
-
+        num_black, num_white, _, _ = self.count()
         return num_black - num_white
 
     def count(self):
@@ -225,14 +203,28 @@ class Board:
 
         parts = fen.split(' ')
 
-        if len(parts) < 2 or len(parts) > 4:
-            return -1
+        if len(parts) < 1 or len(parts) > 4:
+            return False
         if parts[0].count('/') != 6:
-            return -2
-        if len(parts[0]) < 13 or len(parts[0]) > 55:
-            return -3
-        if len(parts[1]) != 1:
-            return -4
+            return False
+        if len(parts[0]) < len("7/7/7/7/7/7/7"):
+            return False
+        if len(parts[0]) > len("xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx"):
+            return False
+
+        # Clear board
+        for x in range(self.w):
+            for y in range(self.h):
+                self.set(x, y, EMPTY)
+        self.turn = BLACK
+        self.halfmove_clock = 0
+        self.fullmove_clock = 1
+        self.history = []
+        self.halfmove_stack = []
+
+        # Add side to move
+        if len(parts) < 2:
+            parts.append("x")
 
         # Add halfmove counter
         if len(parts) < 3:
@@ -242,10 +234,7 @@ class Board:
         if len(parts) < 4:
             parts.append("1")
 
-        for x in range(self.w):
-            for y in range(self.h):
-                self.set(x, y, EMPTY)
-
+        # Set board
         sq = 0
         for c in parts[0]:
             x, y = sq%self.w, self.h - sq//self.h - 1
@@ -264,26 +253,34 @@ class Board:
             elif c in ['/']:
                 pass
             else:
-                return -5
+                return False
 
+        # We need to have parsed the right number of squares
+        if sq != self.w * self.h:
+            return False
+
+        # Set turn
         if parts[1] in "bBxX":
             self.turn = BLACK
         elif parts[1] in "wWoO":
             self.turn = WHITE
         else:
-            return -6
+            return False
 
+        # Set halfmove clock
         if parts[2].isdigit():
             self.halfmove_clock = int(parts[2])
         else:
-            return -7
+            return False
 
+        # Set fullmove clock
         if parts[3].isdigit():
             self.fullmove_clock = int(parts[3])
         else:
-            return -8
+            return False
 
-        self.history = []
+        # Save fen
+        self._start_fen = ' '.join(parts)
 
         return True
 
@@ -309,14 +306,11 @@ class Board:
         if move.is_double():
             self.set(move.fr_x, move.fr_y, EMPTY)
 
-        captures = False
-
         for idx, (dx, dy) in enumerate(SINGLES):
             x, y = move.to_x + dx, move.to_y + dy
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
-                captures = True
             else:
                 move.flipped[idx] = False
 
@@ -358,8 +352,14 @@ class Board:
 
     def main_line(self):
         return self.history
+    
+    def start_fen(self):
+        return self._start_fen
 
     def legal_moves(self, side=None, full=False):
+        if self.gameover():
+            return []
+
         if side is None:
             side = self.turn
 
@@ -412,22 +412,33 @@ class Board:
         return nodes
 
     def gameover(self):
+        # 50 move rule
         if self.fifty_move_draw():
             return True
 
+        # Max game length
         if self.max_length_draw():
             return True
 
+        # No pieces left, no gaps left
         num_black, num_white, num_gaps, num_empty = self.count()
         if num_empty == 0 or num_black == 0 or num_white == 0:
             return True
 
-        if len(self.history) >= 2:
-            *_, second_last, last = self.history
-            if second_last == Move.null() and last == Move.null():
-                return True
+        # No moves left
+        for x in range(self.w):
+            for y in range(self.h):
+                if self.get(x, y) in [BLACK, WHITE]:
+                    # Singles
+                    for dx, dy in SINGLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            return False
+                    # Doubles
+                    for dx, dy in DOUBLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            return False
 
-        return False
+        return True
 
     def result(self):
         if not self.gameover():

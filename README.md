@@ -1,7 +1,13 @@
 # python-ataxx: A Python library for the board game Ataxx
 
 ## About
-python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing.
+python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing. The API and rules for the game are still subject to change, be careful when updating.
+
+## Tests
+Run the following command from the root project directory
+```Bash
+python -m unittest discover
+```
 
 ## Usage
 ```Python3
@@ -41,7 +47,7 @@ Turn: X
 * FEN parsing
 ```Python3
 >>> board = ataxx.Board("startpos")
->>> board = ataxx.Board("x5o/7/2-1-2/7/2-1-2/7/o5x x")
+>>> board = ataxx.Board("x5o/7/2-1-2/7/2-1-2/7/o5x x 0 1")
 ```
 
 * Result detection
