@@ -91,14 +91,14 @@ class Move:
 
 class Board:
     def __init__(self, fen="startpos"):
-        self.board = [[GAP for x in range(7+4)] for y in range(7+4)]
+        self._board = [[GAP for x in range(7+4)] for y in range(7+4)]
         self.set_fen(fen)
 
     def get(self, x, y):
-        return self.board[x+2][y+2]
+        return self._board[x+2][y+2]
 
     def set(self, x, y, n):
-        self.board[x+2][y+2] = n
+        self._board[x+2][y+2] = n
 
     def fifty_move_draw(self):
         return self.halfmove_clock >= 100
