@@ -2,10 +2,16 @@ import ataxx
 import random
 
 def random_move(board):
+    if board.gameover():
+        return ataxx.Move.null()
+
     moves = board.legal_moves()
     return random.choice(moves)
 
 def greedy(board):
+    if board.gameover():
+        return ataxx.Move.null()
+
     most = -99999
     moves = []
 
