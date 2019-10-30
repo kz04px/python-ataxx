@@ -3,14 +3,6 @@ import unittest
 
 class TestMethods(unittest.TestCase):
     def test_draws(self):
-        # Check nullmove draw conditions
-        board = ataxx.Board()
-        board.makemove(ataxx.Move.null())
-        board.makemove(ataxx.Move.null())
-        self.assertTrue(board.gameover())
-        self.assertFalse(board.fifty_move_draw())
-        self.assertFalse(board.max_length_draw())
-
         # Check double move draw conditions
         board = ataxx.Board()
         for i in range(500):

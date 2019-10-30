@@ -29,12 +29,4 @@ class TestMethods(unittest.TestCase):
 
         for fen, result in tests:
             board = ataxx.Board(fen)
-
-            # Check the result is right
             self.assertTrue(board.result() == result)
-
-            # Check that if we double pass (null move) we get a decisive result
-            if result == "*":
-                board.makemove(ataxx.Move.null())
-                board.makemove(ataxx.Move.null())
-                self.assertTrue(board.result() != "*")

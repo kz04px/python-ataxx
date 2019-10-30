@@ -423,12 +423,6 @@ class Board:
         if num_empty == 0 or num_black == 0 or num_white == 0:
             return True
 
-        # Two null moves in a row
-        if len(self.history) >= 2:
-            *_, second_last, last = self.history
-            if second_last == Move.null() and last == Move.null():
-                return True
-
         # No moves left
         for x in range(self.w):
             for y in range(self.h):
