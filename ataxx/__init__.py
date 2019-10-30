@@ -412,7 +412,7 @@ class Board:
 
         return move in self.legal_moves()
 
-    def perft(self, depth, full=False):
+    def perft(self, depth):
         """Return the number of leaf nodes to a given ply from the current position
 
         Parameters:
