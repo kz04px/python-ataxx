@@ -213,7 +213,7 @@ class Board:
         self.halfmove_clock = 0
         self.fullmove_clock = 1
         self.history = []
-        self.halfmove_stack = []
+        self._halfmove_stack = []
 
         # Add side to move
         if len(parts) < 2:
@@ -283,7 +283,7 @@ class Board:
         else:
             opponent = BLACK
 
-        self.halfmove_stack.append(self.halfmove_clock)
+        self._halfmove_stack.append(self.halfmove_clock)
 
         if self.turn == WHITE:
             self.fullmove_clock += 1
@@ -324,7 +324,7 @@ class Board:
             self.fullmove_clock -= 1
 
         move = self.history.pop()
-        self.halfmove_clock = self.halfmove_stack.pop()
+        self.halfmove_clock = self._halfmove_stack.pop()
         self.turn = us
 
         if move == Move.null():
