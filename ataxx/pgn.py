@@ -145,7 +145,7 @@ class Node():
 class Game():
     def __init__(self):
         self.headers = {}
-        self.headers["Event"] = "Example"
+        self.headers["Event"] = "?"
         self.headers["Site"] = "?"
         self.headers["Date"] = datetime.today().strftime("%Y.%m.%d")
         self.headers["Round"] = "-"

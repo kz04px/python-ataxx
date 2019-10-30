@@ -6,41 +6,41 @@ import string
 
 pgns = [
 """[Event "Example 1"]
-[Black "Player 1"]
-[White "Player 2"]
-[UTCDate "1970.01.01"]
-[UTCTime "00:00:00"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
 [Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
 
 1. a7c5 a2 2. g2 *""",
 """[Event "Example 2"]
-[Black "Player 1"]
-[White "Player 2"]
-[UTCDate "1970.01.01"]
-[UTCTime "00:00:00"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
 [Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
 
 1. a7c5 { Test 123 } 1... a2 { Test } 2. g2 *""",
 
 """[Event "Example 3"]
-[Black "Player 1"]
-[White "Player 2"]
-[UTCDate "1970.01.01"]
-[UTCTime "00:00:00"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
 [Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
 
 1. a7c7 (1. a7c5 { Test }) 1... g7f5 (1... a2 { Test } 2. g2 (2. f2 { Test })) 2. g1f3 a1b3 { Test 123 } *""",
 
 """[Event "Example 4"]
-[Black "Player 1"]
-[White "Player 2"]
-[UTCDate "1970.01.01"]
-[UTCTime "00:00:00"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
 [Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
 
 1. a7c7 { Test } (1. a7c5 { Test }) 1... g7f5 (1... a2 { Test } 2. g2 (2. f2 { Test } 2... a1c2)) 2. g1f3 a1b3 { Test 123 } *"""
 ]
@@ -52,16 +52,24 @@ class TestMethods(unittest.TestCase):
     def test_pgn_known(self):
         # Test some known pgn strings
         for pgn in pgns:
-            self.assertTrue(str(ataxx.pgn.parse(pgn)) == pgn)
+            parsed = ataxx.pgn.parse(pgn)
+            del parsed.headers["Date"]
+            self.assertTrue(str(parsed) == pgn)
 
     def test_pgn_create(self):
         # Create a pgn ourselves
         game = ataxx.pgn.Game()
-        game.headers["FEN"] = ataxx.FEN_STARTPOS
+        game.headers["Event"] = "Example"
+        game.headers["Site"] = "?"
+        game.headers["Round"] = "-"
+        game.headers["White"] = "?"
+        game.headers["Black"] = "?"
         game.headers["Result"] = "*"
+        game.headers["FEN"] = ataxx.FEN_STARTPOS
+        del game.headers["Date"]
         node = game.add_variation(ataxx.Move.from_san("g2"), comment="First move")
         node = node.add_variation(ataxx.Move.from_san("a1a3"), comment="Second move")
-        self.assertTrue(str(game) == "[Event \"Example\"]\n[FEN \"x5o/7/7/7/7/7/o5x x 0 1\"]\n[Result \"*\"]\n\n1. g2 { First move } a1a3 { Second move } *")
+        self.assertTrue(str(game) == "[Event \"Example\"]\n[Site \"?\"]\n[Round \"-\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[FEN \"x5o/7/7/7/7/7/o5x x 0 1\"]\n\n1. g2 { First move } a1a3 { Second move } *")
 
     def test_pgn_random(self):
         # Try parse some random games
