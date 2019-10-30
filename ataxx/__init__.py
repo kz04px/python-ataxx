@@ -1,6 +1,6 @@
 __author__ = "kz04px"
 __url__ = "https://github.com/kz04px/python-ataxx"
-__version__ = "1.1.0"
+__version__ = "2.0.0"
 
 BLACK, WHITE, GAP, EMPTY = 0, 1, 2, 3
 SINGLES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
