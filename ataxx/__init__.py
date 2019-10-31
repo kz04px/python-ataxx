@@ -25,7 +25,7 @@ class Move:
         if san == "0000":
             return cls.null()
         elif len(san) == 2:
-            if san[0] not in "abcdefgABCDEFG":
+            if san[0] not in "abcdefg":
                 raise Exception(F"ValueError {san}")
             elif san[1] not in "1234567":
                 raise Exception(F"ValueError {san}")
@@ -34,11 +34,11 @@ class Move:
             to_y = ord(san[1]) - ord('1')
             return cls(to_x, to_y, to_x, to_y)
         elif len(san) == 4:
-            if san[0] not in "abcdefgABCDEFG":
+            if san[0] not in "abcdefg":
                 raise Exception(F"ValueError {san}")
             elif san[1] not in "1234567":
                 raise Exception(F"ValueError {san}")
-            elif san[2] not in "abcdefgABCDEFG":
+            elif san[2] not in "abcdefg":
                 raise Exception(F"ValueError {san}")
             elif san[3] not in "1234567":
                 raise Exception(F"ValueError {san}")
@@ -47,6 +47,16 @@ class Move:
             fr_y = ord(san[1]) - ord('1')
             to_x = ord(san[2]) - ord('a')
             to_y = ord(san[3]) - ord('1')
+            dx = abs(fr_x - to_x)
+            dy = abs(fr_y - to_y)
+
+            if dx > 2:
+                raise Exception(F"ValueError {san}")
+            elif dy > 2:
+                raise Exception(F"ValueError {san}")
+            elif dx <= 1 and dy <= 1:
+                raise Exception(F"ValueError {san}")
+
             return cls(fr_x, fr_y, to_x, to_y)
         else:
             raise Exception(F"ValueError {san}")
