@@ -8,7 +8,7 @@ readme = open('README.md').read()
 
 setup(
     name = 'ataxx',
-    version = '1.1.0',
+    version = '2.0.0',
     license = 'MIT',
     description = 'python-ataxx is written in Python 3 and supports basic features such as move generation, move validation, engine communication, and board printing.',
     long_description = readme,
