@@ -4,7 +4,7 @@ import sys
 if sys.version_info < (3, 6):
     raise ImportError('Python 3.6 or greater is required')
 
-readme = open('README.md').read()
+readme = open('README.md', encoding='utf-8').read()
 
 setup(
     name = 'ataxx',
