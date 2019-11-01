@@ -3,7 +3,7 @@ import ataxx.pgn
 
 def main():
     """
-    Search games.pgn for the specified player 
+    Search games.pgn for the specified player
     """
     target = "Player 2"
     for game in ataxx.pgn.GameIterator("games.pgn"):
