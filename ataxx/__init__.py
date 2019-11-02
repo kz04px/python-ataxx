@@ -368,6 +368,7 @@ class Board:
         move = self.history.pop()
         self.halfmove_clock = self._halfmove_stack.pop()
         self.turn = us
+        self.hash ^= get_turn_hash(self.turn)
 
         if move == Move.null():
             return
@@ -385,8 +386,9 @@ class Board:
         for idx, val in enumerate(move.flipped):
             if val:
                 dx, dy = SINGLES[idx]
-                self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, self.get(move.to_x + dx, move.to_y + dy))
                 self.set(move.to_x + dx, move.to_y + dy, them)
+                self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, us)
+                self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, them)
 
     def get_hash(self):
         return self.hash
