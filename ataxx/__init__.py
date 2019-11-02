@@ -333,7 +333,7 @@ class Board:
         self.hash ^= get_sq_hash(move.to_x, move.to_y, self.turn)
 
         if move.is_double():
-            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, them)
+            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, self.turn)
             self.set(move.fr_x, move.fr_y, EMPTY)
 
         for idx, (dx, dy) in enumerate(SINGLES):
@@ -379,7 +379,7 @@ class Board:
 
         # Restore the piece we removed
         if move.is_double():
-            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, self.get(move.fr_x, move.fr_y))
+            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, us)
             self.set(move.fr_x, move.fr_y, us)
 
         # Restore the pieces we captured

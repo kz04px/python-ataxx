@@ -59,7 +59,7 @@ def calculate_hash(b):
     return key
 
 def get_turn_hash(side):
-    return turn if side == ataxx.BLACK else 0
+    return turn
 
 def get_sq_hash(x, y, side):
     if side == ataxx.BLACK:
