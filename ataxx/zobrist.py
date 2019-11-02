@@ -57,3 +57,15 @@ def calculate_hash(b):
                 key ^= piece[1][y * 7 + x]
 
     return key
+
+def get_turn_hash(side):
+    return key if side == ataxx.BLACK else 0
+
+def get_sq_hash(x, y, side):
+    if side == ataxx.BLACK:
+        return piece[0][y * 7 + x]
+
+    if side == ataxx.WHITE:
+        return piece[1][y * 7 + x]
+
+    return 0
