@@ -77,10 +77,14 @@ class Engine():
             self.send_line("uai")
             self.uaiok_received.wait()
 
-    def isready(self):
+    def isready(self, to=0):
         with self.readyok_received:
             self.send_line("isready")
-            self.readyok_received.wait()
+
+            if to:
+                self.readyok_received.wait(to)
+            else:
+                self.readyok_received.wait()
 
     def uainewgame(self):
         self.send_line("uainewgame")
@@ -91,25 +95,19 @@ class Engine():
         else:
             self.send_line(F"position fen {fen}")
 
-    def go(self, times=None, movetime=None, depth=None, nodes=None):
+    def go(self, times=None, movetime=None, depth=None, nodes=None, maxwait=None):
         self.bestmove = None
 
         with self.bestmove_received:
-            maxwait = 0
-
             if times:
                 btime, wtime, binc, winc = times
                 self.send_line(F"go btime {btime} wtime {wtime} binc {binc} winc {winc}")
-                maxwait = (btime + wtime) / 2.0 # FIXME
             elif movetime:
                 self.send_line(F"go movetime {movetime}")
-                maxwait = movetime
             elif depth:
                 self.send_line(F"go depth {depth}")
-                maxwait = None
             elif nodes:
                 self.send_line(F"go nodes {nodes} simulations {nodes}")
-                maxwait = None
 
             if maxwait:
                 self.bestmove_received.wait(maxwait)
