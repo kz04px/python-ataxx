@@ -360,6 +360,7 @@ class Board:
             us = WHITE
         else:
             us = BLACK
+        self.hash ^= get_turn_hash(self.turn)
         them = self.turn
 
         if self.turn == BLACK:
@@ -368,7 +369,6 @@ class Board:
         move = self.history.pop()
         self.halfmove_clock = self._halfmove_stack.pop()
         self.turn = us
-        self.hash ^= get_turn_hash(self.turn)
 
         if move == Move.null():
             return
