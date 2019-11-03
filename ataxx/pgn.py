@@ -48,10 +48,11 @@ def parse_moves(board, parent, q):
                 word = q.get()
                 if word == "}":
                     break
-                if last_node.comment == None:
-                    last_node.comment = word
-                else:
-                    last_node.comment += " " + word
+                if last_node:
+                    if last_node.comment == None:
+                        last_node.comment = word
+                    else:
+                        last_node.comment += " " + word
         # An alternate line just started
         elif word == "(":
             nboard = copy.deepcopy(board)
