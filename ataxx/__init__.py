@@ -2,6 +2,8 @@ __author__ = "kz04px"
 __url__ = "https://github.com/kz04px/python-ataxx"
 __version__ = "2.0.0"
 
+from ataxx.zobrist import calculate_hash, get_turn_hash, get_sq_hash
+
 BLACK, WHITE, GAP, EMPTY = 0, 1, 2, 3
 SINGLES = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 DOUBLES = [(-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -2), (0, 2), (1, -2), (1, 2), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)]
@@ -302,6 +304,8 @@ class Board:
         # Save fen
         self._start_fen = ' '.join(parts)
 
+        self.hash = calculate_hash(self)
+
         return True
 
     def makemove(self, move):
@@ -320,12 +324,16 @@ class Board:
         # Null move
         if move == Move.null():
             self.turn = opponent
+            self.hash ^= get_turn_hash(self.turn)
             self.history.append(move)
             self.halfmove_clock += 1
             return
 
         self.set(move.to_x, move.to_y, self.turn)
+        self.hash ^= get_sq_hash(move.to_x, move.to_y, self.turn)
+
         if move.is_double():
+            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, self.turn)
             self.set(move.fr_x, move.fr_y, EMPTY)
 
         for idx, (dx, dy) in enumerate(SINGLES):
@@ -333,11 +341,14 @@ class Board:
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
+                self.hash ^= get_sq_hash(x, y, opponent)
+                self.hash ^= get_sq_hash(x, y, self.turn)
             else:
                 move.flipped[idx] = False
 
         self.history.append(move)
         self.turn = opponent
+        self.hash ^= get_turn_hash(self.turn)
         self.halfmove_clock += 1
         if move.is_single():
             self.halfmove_clock = 0
@@ -349,6 +360,7 @@ class Board:
             us = WHITE
         else:
             us = BLACK
+        self.hash ^= get_turn_hash(self.turn)
         them = self.turn
 
         if self.turn == BLACK:
@@ -362,10 +374,12 @@ class Board:
             return
 
         # Remove the piece we placed
+        self.hash ^= get_sq_hash(move.to_x, move.to_y, self.get(move.to_x, move.to_y))
         self.set(move.to_x, move.to_y, EMPTY)
 
         # Restore the piece we removed
         if move.is_double():
+            self.hash ^= get_sq_hash(move.fr_x, move.fr_y, us)
             self.set(move.fr_x, move.fr_y, us)
 
         # Restore the pieces we captured
@@ -373,6 +387,11 @@ class Board:
             if val:
                 dx, dy = SINGLES[idx]
                 self.set(move.to_x + dx, move.to_y + dy, them)
+                self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, us)
+                self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, them)
+
+    def get_hash(self):
+        return self.hash
 
     def main_line(self):
         """Return the list of moves that have been applied to the board"""
