@@ -223,7 +223,7 @@ class Board:
         elif fen == "empty":
             fen = FEN_EMPTY
 
-        parts = fen.split(' ')
+        parts = fen.split()
 
         if len(parts) < 1 or len(parts) > 4:
             return False
