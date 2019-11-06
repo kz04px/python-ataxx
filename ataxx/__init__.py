@@ -79,6 +79,9 @@ class Move:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash((self.fr_x, self.fr_y, self.to_x, self.to_y))
+
     def __str__(self):
         # Null move
         if self == Move.null():
