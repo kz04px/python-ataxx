@@ -68,25 +68,13 @@ class Move:
         return cls(-1, -1, -1, -1)
 
     def is_single(self):
-        dX = abs(self.fr_x - self.to_x)
-        dY = abs(self.fr_y - self.to_y)
-        return dX <= 1 and dY <= 1
+        return self.fr_x == self.to_x and self.fr_y == self.to_y
 
     def is_double(self):
         return not self.is_single()
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            self_single = self.is_single()
-            other_single = other.is_single()
-            if self_single != other_single:
-                return False
-            elif self_single and other_single:
-                return self.to_x == other.to_x and self.to_y == other.to_y
-            else:
-                return self.fr_x == other.fr_x and self.fr_y == other.fr_y and self.to_x == other.to_x and self.to_y == other.to_y
-        else:
-            return False
+        return self.fr_x == other.fr_x and self.fr_y == other.fr_y and self.to_x == other.to_x and self.to_y == other.to_y
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -223,7 +211,7 @@ class Board:
         elif fen == "empty":
             fen = FEN_EMPTY
 
-        parts = fen.split(' ')
+        parts = fen.split()
 
         if len(parts) < 1 or len(parts) > 4:
             return False

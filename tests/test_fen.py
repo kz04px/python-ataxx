@@ -16,6 +16,21 @@ class TestMethods(unittest.TestCase):
             self.assertTrue(board.get_fen() == fen)
             self.assertTrue(board.start_fen() == fen)
 
+    def test_malformed(self):
+        tests = [
+            ["x5o/7/7/7/7/7/o5x x 0 1 " ,"x5o/7/7/7/7/7/o5x x 0 1"],
+            ["x5o/7/7/7/7/7/o5x x 0 1   " ,"x5o/7/7/7/7/7/o5x x 0 1"],
+            ["x5o/7/7/7/7/7/o5x x 0  1" ,"x5o/7/7/7/7/7/o5x x 0 1"],
+            ["x5o/7/7/7/7/7/o5x x  0 1" ,"x5o/7/7/7/7/7/o5x x 0 1"],
+            ["x5o/7/7/7/7/7/o5x  x 0 1" ,"x5o/7/7/7/7/7/o5x x 0 1"],
+            [" x5o/7/7/7/7/7/o5x x 0 1" ,"x5o/7/7/7/7/7/o5x x 0 1"],
+        ]
+
+        for fen, corrected in tests:
+            board = ataxx.Board()
+            self.assertTrue(board.set_fen(fen) == True)
+            self.assertTrue(board.get_fen() == corrected)
+
     def test_partial(self):
         tests = [
             ["x5o/7/7/7/7/7/o5x", "x5o/7/7/7/7/7/o5x x 0 1"],
