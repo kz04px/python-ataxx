@@ -381,6 +381,35 @@ class Board:
                 self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, us)
                 self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, them)
 
+    def predict_hash(self, move):
+        """Calculate the hash after a move is played without applying the move"""
+
+        if self.turn == BLACK:
+            opponent = WHITE
+        else:
+            opponent = BLACK
+
+        hash = self.get_hash()
+
+        hash ^= get_turn_hash(self.turn)
+
+        # Null move
+        if move == Move.null():
+            return hash
+
+        hash ^= get_sq_hash(move.to_x, move.to_y, self.turn)
+
+        if move.is_double():
+            hash ^= get_sq_hash(move.fr_x, move.fr_y, self.turn)
+
+        for dx, dy in SINGLES:
+            x, y = move.to_x + dx, move.to_y + dy
+            if self.get(x, y) == opponent:
+                hash ^= get_sq_hash(x, y, opponent)
+                hash ^= get_sq_hash(x, y, self.turn)
+
+        return hash
+
     def get_hash(self):
         return self.hash
 
