@@ -426,28 +426,57 @@ class Board:
     def legal_moves(self):
         """Return the list of legal moves in the current position"""
 
-        if self.gameover():
+        # 50 move rule
+        if self.fifty_move_draw():
             return []
+
+        has_us = False
+        has_them = False
+        has_empty = False
 
         movelist = []
         for x in range(7):
             for y in range(7):
                 # Singles
                 if self.get(x, y) == EMPTY:
+                    has_empty = True
                     for dx, dy in SINGLES:
                         if self.get(x+dx, y+dy) == self.turn:
                             movelist.append(Move(x, y, x, y))
                             break
                 # Doubles
                 elif self.get(x, y) == self.turn:
+                    has_us = True
                     for dx, dy in DOUBLES:
                         if self.get(x+dx, y+dy) == EMPTY:
                             movelist.append(Move(x, y, x+dx, y+dy))
+                else:
+                    has_them = True
 
+        # No pieces left, no gaps left
+        if not has_empty or not has_us or not has_them:
+            return []
+
+        # We can't move
         if movelist == []:
-            return [Move.null()]
-        else:
-            return movelist
+            # If the opponent can move, we have to pass
+            opponent = WHITE if self.turn == BLACK else BLACK
+            for x in range(7):
+                for y in range(7):
+                    if self.get(x, y) == opponent:
+                        # Singles
+                        for dx, dy in SINGLES:
+                            if self.get(x+dx, y+dy) == EMPTY:
+                                return [Move.null()]
+                        # Doubles
+                        for dx, dy in DOUBLES:
+                            if self.get(x+dx, y+dy) == EMPTY:
+                                return [Move.null()]
+
+            # If neither side can move, it's game over
+            return []
+
+        return movelist
 
     def is_legal(self, move):
         """Return whether a given move is legal in the current position
