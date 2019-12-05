@@ -1,5 +1,6 @@
 import ataxx
 import ataxx.pgn
+import ataxx.players
 import unittest
 import random
 import string
