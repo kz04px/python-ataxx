@@ -45,6 +45,8 @@ def parse_moves(board, parent, q):
         # A comment just started
         elif word == "{":
             while True:
+                if q.empty():
+                    raise ValueError
                 word = q.get()
                 if word == "}":
                     break
@@ -57,10 +59,21 @@ def parse_moves(board, parent, q):
         elif word == "(":
             nboard = copy.deepcopy(board)
             nboard.undo()
-            parse_moves(nboard, last_children, q)
+            n = parse_moves(nboard, last_children, q)
+            if n != True:
+                raise ValueError
         # An alternate line just finished
         elif word == ")":
-            break
+            return True
+        # We found a move number
+        elif word[0].isdigit() and word[-1] == '.':
+            pass
+        # We found the game result
+        elif word in ["1-0", "0-1", "1/2-1/2", "*"]:
+            pass
+        # Illegal token found
+        else:
+            raise ValueError
 
 def parse(string):
     game = Game()
@@ -249,11 +262,17 @@ class Game():
 class PGNIterator():
     def __init__(self, input_, is_string=False):
         self.path = input_
+        self.file = None
         if is_string:
             self.iterator = iter(input_)
         else:
-            self.iterator = iter(open(self.path))
+            self.file = open(self.path)
+            self.iterator = iter(self.file)
         self.lines = []
+
+    def __del__(self):
+        if self.file:
+            self.file.close()
 
     def __iter__(self):
         return self
@@ -300,5 +319,8 @@ class GameIterator():
 
     def __next__(self):
         for string in self.iterator:
-            return parse(string)
+            try:
+                return parse(string)
+            except:
+                pass
         raise StopIteration

@@ -1,0 +1,145 @@
+[Event "0001"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x 0 1"]
+[Valid "true"]
+
+1. a7c5 a2 2. g2 *
+
+
+[Event "0002"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
+[Valid "true"]
+
+1. a7c5 { Test 123 } 1... a2 { Test } 2. g2 *
+
+
+[Event "0003"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x"]
+[Valid "true"]
+
+1. a7c7 (1. a7c5 { Test }) 1... g7f5 (1... a2 { Test } 2. g2 (2. f2 { Test })) 2. g1f3 a1b3 { Test 123 } *
+
+
+[Event "0004"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c5 d4 *
+
+
+[Event "0005"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 Test 1... a2 *
+
+
+[Event "0006"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 { Test 1... a2 *
+
+
+[Event "0007"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 Test } 1... a2 *
+
+
+[Event "0008"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 } 1... a2 *
+
+
+[Event "0009"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 (1. a7c6 1... a2 *
+
+
+[Event "0010"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "false"]
+
+1. a7c7 1. a7c6) 1... a2 *
+
+
+[Event "0011"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "true"]
+
+1. a7c5 a2
+2. g2 *
+
+
+[Event "0012"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[Valid "true"]
+
+1. a7c5
+a2
+
+
+2. g2
+*
+
+
+[Event "0013"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x 0 1"]
+[Valid "true"]
+
+1. a7c5 a2 { Comment (1.. b2)} 2. g2 *
+
+
+[Event "0014"]
+[Site "?"]
+[Round "-"]
+[White "Player 1"]
+[Black "Player 2"]
+[Result "*"]
+[FEN "x5o/7/7/7/7/7/o5x x 0 1"]
+[Valid "true"]
+
+1. a7c5 a2 2. g2 *

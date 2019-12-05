@@ -4,58 +4,21 @@ import ataxx.players
 import unittest
 import random
 import string
-
-pgns = [
-"""[Event "Example 1"]
-[Site "?"]
-[Round "-"]
-[White "Player 1"]
-[Black "Player 2"]
-[Result "*"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
-
-1. a7c5 a2 2. g2 *""",
-"""[Event "Example 2"]
-[Site "?"]
-[Round "-"]
-[White "Player 1"]
-[Black "Player 2"]
-[Result "*"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
-
-1. a7c5 { Test 123 } 1... a2 { Test } 2. g2 *""",
-
-"""[Event "Example 3"]
-[Site "?"]
-[Round "-"]
-[White "Player 1"]
-[Black "Player 2"]
-[Result "*"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
-
-1. a7c7 (1. a7c5 { Test }) 1... g7f5 (1... a2 { Test } 2. g2 (2. f2 { Test })) 2. g1f3 a1b3 { Test 123 } *""",
-
-"""[Event "Example 4"]
-[Site "?"]
-[Round "-"]
-[White "Player 1"]
-[Black "Player 2"]
-[Result "*"]
-[FEN "x5o/7/7/7/7/7/o5x x"]
-
-1. a7c7 { Test } (1. a7c5 { Test }) 1... g7f5 (1... a2 { Test } 2. g2 (2. f2 { Test } 2... a1c2)) 2. g1f3 a1b3 { Test 123 } *"""
-]
+import os
 
 def random_phrase(n):
     return ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.punctuation + string.digits + " ", k=n))
 
 class TestMethods(unittest.TestCase):
     def test_pgn_known(self):
-        # Test some known pgn strings
-        for pgn in pgns:
-            parsed = ataxx.pgn.parse(pgn)
-            del parsed.headers["Date"]
-            self.assertTrue(str(parsed) == pgn)
+        count = 0
+        path = os.path.dirname(__file__) + "/games.pgn"
+        for pgn in ataxx.pgn.GameIterator(path):
+            self.assertTrue(pgn.headers.get("Valid") == "true")
+            self.assertTrue(pgn.headers.get("Event"))
+            self.assertTrue(pgn.headers.get("Result"))
+            count += 1
+        self.assertTrue(count == 7)
 
     def test_pgn_create(self):
         # Create a pgn ourselves
