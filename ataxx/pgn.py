@@ -18,13 +18,16 @@ def parse_moves(board, parent, q):
     while q.empty() == False:
         word = q.get()
 
+        # Try parse the move
+        try:
+            move = ataxx.Move.from_san(word)
+        except:
+            move = None
+
         # We have a move
-        if word in [str(n) for n in board.legal_moves()]:
+        if move and board.is_legal(move):
             # Create a new node
             node = Node()
-
-            # Get the move
-            move = ataxx.Move.from_san(word)
 
             # Fill the node
             node.move = move
