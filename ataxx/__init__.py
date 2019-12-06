@@ -509,7 +509,41 @@ class Board:
         bool:Whether the move is legal
         """
 
-        return move in self.legal_moves()
+        # gameover
+        if self.gameover():
+            return False
+
+        if self.must_pass():
+            return move == Move.null()
+
+        if move.fr_x < 0 or move.fr_y > 6:
+            return False
+        if move.to_x < 0 or move.to_y > 6:
+            return False
+
+        if move.is_single():
+            # To square must be empty
+            if self.get(move.to_x, move.to_y) != EMPTY:
+                return False
+            # Need a friendly piece nearby
+            for dx, dy in SINGLES:
+                if self.get(move.fr_x+dx, move.fr_y+dy) == self.turn:
+                    return True
+            return False
+        else:
+            # To square must be empty
+            if self.get(move.to_x, move.to_y) != EMPTY:
+                return False
+            # From square must be friendly
+            if self.get(move.fr_x, move.fr_y) != self.turn:
+                return False
+            # Can't move too far
+            dx = move.fr_x - move.to_x
+            dy = move.fr_y - move.to_y
+            if abs(dx) > 2 or abs(dy) > 2:
+                return False
+
+        return True
 
     def perft(self, depth):
         """Return the number of leaf nodes to a given ply from the current position
