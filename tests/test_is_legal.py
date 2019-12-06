@@ -80,7 +80,12 @@ class TestMethods(unittest.TestCase):
             "7/7/7/7/-------/-------/xxxxooo x 0 1",
             "7/7/7/7/-------/-------/xxxxooo o 0 1",
             "7/7/7/7/---1---/-------/xxxxooo x 0 1",
-            "7/7/7/7/---1---/-------/xxxxooo o 0 1"
+            "7/7/7/7/---1---/-------/xxxxooo o 0 1",
+            "xxxxxxx/ooooooo/xxxxxxx/ooooooo/xxxxxxx/ooooooo/xxxxxxx x 0 1",
+            "7/7/7/7/7/7/6x x 0 1",
+            "7/7/7/7/7/7/6x o 0 1",
+            "7/7/7/7/7/7/6o x 0 1",
+            "7/7/7/7/7/7/6o o 0 1"
         ]
 
         all_moves = [ataxx.Move.from_san(n) for n in movestrings]
