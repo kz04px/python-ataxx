@@ -321,6 +321,8 @@ class GameIterator():
         for string in self.iterator:
             try:
                 return parse(string)
-            except:
+            except ValueError:
                 pass
+            except:
+                raise
         raise StopIteration
