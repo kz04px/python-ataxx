@@ -15,16 +15,23 @@ class TestMethods(unittest.TestCase):
             ["xxxxxxx/-------/-------/7/7/-------/ooooooo o 0 1", False],
             ["ooooooo/-------/-------/7/7/-------/xxxxxxx x 0 1", False],
             ["ooooooo/-------/-------/7/7/-------/xxxxxxx o 0 1", True],
+            ["x5o/7/7/7/7/7/o5x x 0 100", False],
+            ["7/7/7/7/4ooo/4ooo/4oox x 0 100", True],
         ]
 
         for fen, passing in tests:
             board = ataxx.Board(fen)
             moves = board.legal_moves()
             num_moves = len(moves)
-            self.assertTrue(board.gameover() == False)
-            if passing:
-                self.assertTrue(num_moves == 1)
-                self.assertTrue(moves[0] == ataxx.Move.null())
+
+            self.assertTrue(board.must_pass() == passing)
+
+            if board.gameover():
+                self.assertTrue(num_moves == 0)
             else:
-                self.assertTrue(num_moves > 0)
-                self.assertTrue(moves[0] != ataxx.Move.null())
+                if passing:
+                    self.assertTrue(num_moves == 1)
+                    self.assertTrue(moves[0] == ataxx.Move.null())
+                else:
+                    self.assertTrue(num_moves > 0)
+                    self.assertTrue(ataxx.Move.null() not in moves)

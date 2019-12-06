@@ -478,6 +478,27 @@ class Board:
 
         return movelist
 
+    def must_pass(self):
+        """Return whether the side to move must pass, this ignores whether the game is over
+
+        Returns:
+        bool:Whether the side to move must pass
+        """
+
+        for x in range(7):
+            for y in range(7):
+                if self.get(x, y) == self.turn:
+                    # Singles
+                    for dx, dy in SINGLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            return False
+                    # Doubles
+                    for dx, dy in DOUBLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            return False
+
+        return True
+
     def is_legal(self, move):
         """Return whether a given move is legal in the current position
 
