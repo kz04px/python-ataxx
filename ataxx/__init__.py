@@ -95,6 +95,7 @@ class Move:
 class Board:
     def __init__(self, fen=FEN_STARTPOS):
         self._board = [[GAP for x in range(7+4)] for y in range(7+4)]
+        self._counts = [0, 0, 0, 49]
         self.set_fen(fen)
 
     def get(self, x, y):
@@ -111,28 +112,32 @@ class Board:
     def score(self):
         """Return the net piece count from black's perspective"""
 
-        num_black, num_white, _, _ = self.count()
-        return num_black - num_white
+        return self.num_black() - self.num_white()
+
+    def num_black(self):
+        """Return the number of black pieces"""
+
+        return self._counts[BLACK]
+
+    def num_white(self):
+        """Return the number of white pieces"""
+
+        return self._counts[WHITE]
+
+    def num_gaps(self):
+        """Return the number of gaps"""
+
+        return self._counts[GAP]
+
+    def num_empty(self):
+        """Return the number of empty squares"""
+
+        return self._counts[EMPTY]
 
     def count(self):
         """Return the number of black pieces, white pieces, gaps, and empty squares"""
 
-        num_black = 0
-        num_white = 0
-        num_gaps = 0
-        num_empty = 0
-        for y in range(7):
-            for x in range(7):
-                if self.get(x, y) == BLACK:
-                    num_black += 1
-                elif self.get(x, y) == WHITE:
-                    num_white += 1
-                elif self.get(x, y) == GAP:
-                    num_gaps += 1
-                elif self.get(x, y) == EMPTY:
-                    num_empty += 1
-
-        return num_black, num_white, num_gaps, num_empty
+        return self.num_black(), self.num_white(), self.num_gaps(), self.num_empty()
 
     def __str__(self):
         board = "  a b c d e f g\n"
@@ -234,6 +239,7 @@ class Board:
         self.fullmove_clock = 1
         self.history = []
         self._halfmove_stack = []
+        self._counts = [0, 0, 0, 49]
 
         # Add side to move
         if len(parts) < 2:
@@ -254,14 +260,18 @@ class Board:
 
             if c in "1234567":
                 sq = sq + int(c)
+                self._counts[EMPTY] += int(c)
             elif c in "bBxX":
                 self.set(x, y, BLACK)
+                self._counts[BLACK] += 1
                 sq = sq + 1
             elif c in "wWoO":
                 self.set(x, y, WHITE)
+                self._counts[WHITE] += 1
                 sq = sq + 1
             elif c in ['-']:
                 self.set(x, y, GAP)
+                self._counts[GAP] += 1
                 sq = sq + 1
             elif c in ['/']:
                 pass
@@ -332,17 +342,21 @@ class Board:
             if self.get(x, y) == opponent:
                 move.flipped[idx] = True
                 self.set(x, y, self.turn)
+                self._counts[self.turn] += 1
+                self._counts[opponent] -= 1
                 self.hash ^= get_sq_hash(x, y, opponent)
                 self.hash ^= get_sq_hash(x, y, self.turn)
             else:
                 move.flipped[idx] = False
 
+        self.halfmove_clock += 1
+        if move.is_single():
+            self._counts[self.turn] += 1
+            self.halfmove_clock = 0
+
         self.history.append(move)
         self.turn = opponent
         self.hash ^= get_turn_hash(self.turn)
-        self.halfmove_clock += 1
-        if move.is_single():
-            self.halfmove_clock = 0
 
     def undo(self):
         """Undoes the last move applied to the board"""
@@ -366,11 +380,13 @@ class Board:
 
         # Remove the piece we placed
         self.hash ^= get_sq_hash(move.to_x, move.to_y, self.get(move.to_x, move.to_y))
+        self._counts[us] -= 1
         self.set(move.to_x, move.to_y, EMPTY)
 
         # Restore the piece we removed
         if move.is_double():
             self.hash ^= get_sq_hash(move.fr_x, move.fr_y, us)
+            self._counts[us] += 1
             self.set(move.fr_x, move.fr_y, us)
 
         # Restore the pieces we captured
@@ -378,6 +394,8 @@ class Board:
             if val:
                 dx, dy = SINGLES[idx]
                 self.set(move.to_x + dx, move.to_y + dy, them)
+                self._counts[us] -= 1
+                self._counts[them] += 1
                 self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, us)
                 self.hash ^= get_sq_hash(move.to_x + dx, move.to_y + dy, them)
 
@@ -430,32 +448,24 @@ class Board:
         if self.fifty_move_draw():
             return []
 
-        has_us = False
-        has_them = False
-        has_empty = False
+        # No pieces left, no gaps left
+        if self.num_empty() == 0 or self.num_black() == 0 or self.num_white() == 0:
+            return []
 
         movelist = []
         for x in range(7):
             for y in range(7):
                 # Singles
                 if self.get(x, y) == EMPTY:
-                    has_empty = True
                     for dx, dy in SINGLES:
                         if self.get(x+dx, y+dy) == self.turn:
                             movelist.append(Move(x, y, x, y))
                             break
                 # Doubles
                 elif self.get(x, y) == self.turn:
-                    has_us = True
                     for dx, dy in DOUBLES:
                         if self.get(x+dx, y+dy) == EMPTY:
                             movelist.append(Move(x, y, x+dx, y+dy))
-                else:
-                    has_them = True
-
-        # No pieces left, no gaps left
-        if not has_empty or not has_us or not has_them:
-            return []
 
         # We can't move
         if movelist == []:
