@@ -91,9 +91,9 @@ class Engine():
 
     def position(self, fen, moves=None):
         if moves:
-            self.send_line(F"position fen {fen} moves {moves}")
+            self.send_line("position fen {} moves {}".format(fen, moves))
         else:
-            self.send_line(F"position fen {fen}")
+            self.send_line("position fen {}".format(fen))
 
     def go(self, times=None, movetime=None, depth=None, nodes=None, maxwait=None):
         self.bestmove = None
@@ -101,13 +101,13 @@ class Engine():
         with self.bestmove_received:
             if times:
                 btime, wtime, binc, winc = times
-                self.send_line(F"go btime {btime} wtime {wtime} binc {binc} winc {winc}")
+                self.send_line("go btime {} wtime {} binc {} winc {}".format(btime, wwtime, binc, winc))
             elif movetime:
-                self.send_line(F"go movetime {movetime}")
+                self.send_line("go movetime {}".format(movetime))
             elif depth:
-                self.send_line(F"go depth {depth}")
+                self.send_line("go depth {}".format(depth))
             elif nodes:
-                self.send_line(F"go nodes {nodes} simulations {nodes}")
+                self.send_line("go nodes {} simulations {}".format(nodes, nodes))
 
             if maxwait:
                 self.bestmove_received.wait(maxwait)
@@ -117,10 +117,10 @@ class Engine():
         return self.bestmove, self.ponder
 
     def perft(self, depth):
-        self.send_line(F"perft {depth}")
+        self.send_line("perft {}".format(depth))
 
     def setoption(self, name, value):
-        self.send_line(F"setoption name {name} value {value}")
+        self.send_line("setoption name {} value {}".format(name, value))
 
     def quit(self):
         # FIXME:

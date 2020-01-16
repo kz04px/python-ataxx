@@ -217,29 +217,29 @@ class Game():
 
         # Print new move number
         if depth%2 == 1:
-            string += F"{(depth+1)//2}. "
+            string += "{}. ".format((depth+1)//2)
         # Print move number if we just left a comment or variation
         else:
             if main.parent and (main.parent.comment or len(main.parent.children) > 1):
-                string += F"{depth//2}... "
+                string += "{}... ".format(depth//2)
 
         # Print main move
         if main.children:
-            string += F"{main.move}"
+            string += "{}".format(main.move)
         else:
-            string += F"{main.move}"
+            string += "{}".format(main.move)
 
         # Add comment
         if main.comment:
-            string += F" {{ {main.comment} }}"
+            string += " {{ {} }}".format(main.comment)
 
         # Print children
         if rest:
             # Always print the move number at the start of a variation
             if depth%2 == 0:
-                string += F" ({depth//2}... {self.recurse(rest, depth)})"
+                string += " ({}... {})".format(depth//2, self.recurse(rest, depth))
             else:
-                string += F" ({self.recurse(rest, depth)})"
+                string += " ({})".format(self.recurse(rest, depth))
 
         if main.children:
             string += " "
