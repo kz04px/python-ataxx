@@ -1,8 +1,8 @@
 from setuptools import setup
 import sys
 
-if sys.version_info < (3, 6):
-    raise ImportError('Python 3.6 or greater is required')
+if sys.version_info < (3, 5):
+    raise ImportError('Python 3.5 or greater is required')
 
 readme = open('README.md', encoding='utf-8').read()
 
