@@ -188,6 +188,7 @@ class Game():
         if board.start_fen() != ataxx.FEN_STARTPOS:
             self.headers["FEN"] = board.start_fen()
             self.headers["SetUp"] = "1"
+        return node
 
     def set_white(self, w):
         self.headers["White"] = w
@@ -216,7 +217,7 @@ class Game():
             string += ""
 
         # Print new move number
-        if depth%2 == 1:
+        if depth&1 == 1:
             string += F"{(depth+1)//2}. "
         # Print move number if we just left a comment or variation
         else:
