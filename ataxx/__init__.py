@@ -1,6 +1,6 @@
 __author__ = "kz04px"
 __url__ = "https://github.com/kz04px/python-ataxx"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 from ataxx.zobrist import calculate_hash, get_turn_hash, get_sq_hash
 
