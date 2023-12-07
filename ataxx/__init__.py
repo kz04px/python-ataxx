@@ -618,9 +618,6 @@ class Board:
         if not self.gameover():
             return "*"
 
-        if self.fifty_move_draw():
-            return "1/2-1/2"
-
         num_black, num_white, num_gaps, num_empty = self.count()
 
         if num_black > num_white:
