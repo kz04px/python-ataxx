@@ -1,6 +1,6 @@
 __author__ = "kz04px"
 __url__ = "https://github.com/kz04px/python-ataxx"
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 
 from ataxx.zobrist import calculate_hash, get_turn_hash, get_sq_hash
 
@@ -615,14 +615,48 @@ class Board:
     def result(self):
         """Returns the game result for the current position or * if the game is not over"""
 
-        if not self.gameover():
-            return "*"
+        num_black: int = 0
+        num_white: int = 0
+        has_moves: bool = False
 
-        num_black, num_white, num_gaps, num_empty = self.count()
+        # No moves left
+        for x in range(7):
+            for y in range(7):
+                piece = self.get(x, y)
 
-        if num_black > num_white:
+                if piece == BLACK:
+                    num_black += 1
+                elif piece == WHITE:
+                    num_white += 1
+
+                # Singles
+                if not has_moves and piece in [BLACK, WHITE]:
+                    for dx, dy in SINGLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            has_moves = True
+                            break
+
+                # Doubles
+                if not has_moves and piece in [BLACK, WHITE]:
+                    for dx, dy in DOUBLES:
+                        if self.get(x+dx, y+dy) == EMPTY:
+                            has_moves = True
+                            break
+
+        if not has_moves:
+            if num_black > num_white:
+                return "1-0"
+            elif num_white > num_black:
+                return "0-1"
+            else:
+                return "1/2-1/2"
+        elif num_black > 0 and num_white == 0:
             return "1-0"
-        elif num_black < num_white:
+        elif num_white > 0 and num_black == 0:
             return "0-1"
-        else:
+        elif num_black == 0 and num_white == 0:
             return "1/2-1/2"
+        elif self.halfmove_clock >= 100:
+            return "1/2-1/2"
+        else:
+            return "*"
